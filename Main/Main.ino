@@ -57,60 +57,9 @@ int lastPrint = 0;
 
 void loop() 
 {
-  bool newReset = digitalRead(RESET);
-
-  if(!reset && newReset)
-  {
-    delay(5000);
-  }
-  if(reset && !newReset)
-  {
-    lastMoveCheck = millis();
-    moveTime = 0;
-
-    Move::walk(FORWARD, 0);
-  }
-
-  reset = newReset;
-
-  if(!reset)
-    return;
-
-  ModeHandler::updateMode();
-  MoveHandler::updateMove();
-
-  // Serial.println();
-  // Serial.print("MODE: ");
-  // Serial.println(mode);
-
-  // Serial.print("ADJUST MODE: ");
-  // Serial.println(adjMode);
-
-  // Serial.print("SEEK MODE: ");
-  // Serial.println(static_cast<int>(seekMode));
-  // Serial.println("-------------------------------------------");
-
-  ////////////////////////////////////////////////////////////////////////
-
-  // Extra::printAllSonicInfo(0);
-  // Extra::printAllSonicInfo(1);
-  // Serial.print("Seek Mode: ");
-  // Serial.println(static_cast<int>(seekMode));
-  // Serial.println("-------------------------------------------");
-  
-  ////////////////////////////////////////////////////////////////////////
-
-  if(millis() - lastPrint > 1000)
-  {
-    lastPrint = millis();
-    int line = ModeHandler::getLineCheck();
-    Serial.print(line);
-    Serial.println("-------------------------------------------");
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////
-
-  // delay(1000);
+  if(FR.getCol() == WHITE)
+    Move::walk(FORWARD, 100);
+  else 
+    move::walk(FORWARD, 0);
 }
 
