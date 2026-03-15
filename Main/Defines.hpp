@@ -1,18 +1,21 @@
 #pragma once
 #define LED           PC13
 
-// #define TRIG1         PA1
-#define TRIG2         PA3
-#define TRIG3         PA7
+// ------------------- SHARP MODULE START ---------------
 
-// #define ECHO1         PA0
-#define ECHO2         PA2
-#define ECHO3         PA6
+#define IR_PIN PA3
+#define MODEL 1080   // GP2Y0A21 (10–80 cm sensor)
 
-#define WH_RB         PB6 
-#define WH_RF         PB7 
-#define WH_LF         PB8 
-#define WH_LB         PB9 
+// ------------------- SHARP MODULE END -----------------
+
+// -------------------- WHEELS START -------------------------
+
+#define WH_RB         PA6 
+#define WH_RF         PA7 
+#define WH_LF         PA8 
+#define WH_LB         PA9 
+
+// -------------------- WHEELS END ---------------------------
 
 #define COL1          PA15     
 #define COL2          PB3    

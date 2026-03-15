@@ -6,6 +6,14 @@
 #include "Sonic.hpp"
 #include "Extra.hpp"
 
+// ---------------------------- TEMP ----------------------------------- //
+
+#include <SharpID.h>
+
+SharpIR sensor(IR_PIN, MODEL);
+
+// ---------------------------- TEMP ----------------------------------- //
+
 // Color Sensors
 Light FR(COL1, false),FL(COL2, false),BR(COL3, false),BL(COL4, false);
 Light* lights[] = {&FR, &FL, &BR, &BL};
@@ -55,11 +63,21 @@ void setup()
 bool reset = 0;
 int lastPrint = 0;
 
-void loop() 
-{
-  if(FR.getCol() == WHITE)
+void loop() {
+
+  int distance = sensor.distance();
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if(distance > 10){
     Move::walk(FORWARD, 100);
-  else 
-    move::walk(FORWARD, 0);
+  }
+  else{
+    Move::walk(FORWARD, 0);
+  }
+
+  delay(100);
 }
 
