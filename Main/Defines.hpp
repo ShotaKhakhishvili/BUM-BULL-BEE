@@ -3,7 +3,9 @@
 
 // ------------------- SHARP MODULE START ---------------
 
-#define IR_PIN PA3
+#define IR_M PA3
+#define IR_L PA6
+#define IR_R PA7
 #define MODEL 1080   // GP2Y0A21 (10–80 cm sensor)
 
 // ------------------- SHARP MODULE END -----------------

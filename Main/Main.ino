@@ -9,7 +9,9 @@
 
 #include <SharpIR.h>
 
-SharpIR sensor(IR_PIN, MODEL);
+SharpIR sharp_M(IR_M, MODEL);
+SharpIR sharp_L(IR_L, MODEL);
+SharpIR sharp_R(IR_R, MODEL);
 
 // ---------------------------- TEMP ----------------------------------- //
 
@@ -53,11 +55,7 @@ int lastPrint = 0;
 
 void loop() {
 
-  int distance = sensor.distance();
-
-  Serial.print("Distance: ");
-  Serial.print(distance);
-  Serial.println(" cm");
+  int distance = sharp_M.distance();
 
   if(distance > 15){
     Move::walk(FORWARD, 100);
