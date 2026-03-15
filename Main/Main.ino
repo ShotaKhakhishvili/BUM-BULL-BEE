@@ -59,7 +59,7 @@ void loop() {
   Serial.print(distance);
   Serial.println(" cm");
 
-  if(distance > 10){
+  if(distance > 15){
     Move::walk(FORWARD, 100);
   }
   else{

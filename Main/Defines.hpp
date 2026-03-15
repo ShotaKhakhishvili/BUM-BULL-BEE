@@ -10,10 +10,10 @@
 
 // -------------------- WHEELS START -------------------------
 
-#define WH_RB         PA6 
-#define WH_RF         PA7 
-#define WH_LF         PA8 
-#define WH_LB         PA9 
+#define WH_RB         PB6 
+#define WH_RF         PB7 
+#define WH_LF         PB8 
+#define WH_LB         PB9 
 
 // -------------------- WHEELS END ---------------------------
 
