@@ -41,18 +41,15 @@ void setup()
 
 void loop()
 {
-    digitalWrite(LED, HIGH);
-
     ForwardDistanceResult forward = SharpManager::readForward();
 
     if (forward.tooClose)
     {
-        Serial.println("[LOOP] branch=tooClose action=stop");
+        digitalWrite(LED, LOW);
         Move::walk(FORWARD, 0);
     }
     else if (forward.outOfRange)
     {
-        Serial.println("[LOOP] branch=outOfRange action=search");
         Move::walk(FORWARD, SEARCH_SPEED);
     }
     else
