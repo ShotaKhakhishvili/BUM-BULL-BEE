@@ -9,11 +9,6 @@
 Light FR(COL1, false), FL(COL2, false), BR(COL3, false), BL(COL4, false);
 Light* lights[] = { &FR, &FL, &BR, &BL };
 
-// Modes
-int mode = MODE_SEEK;
-int adjMode = ADJ_NONE;
-SeekMode seekMode = SeekMode::SEEK_NONE;
-
 // Moves
 unsigned long lastPrint = 0;
 
@@ -50,10 +45,12 @@ void loop()
 
     if (forward.tooClose)
     {
+        Serial.println("[LOOP] branch=tooClose action=stop");
         Move::walk(FORWARD, 0);
     }
     else if (forward.outOfRange)
     {
+        Serial.println("[LOOP] branch=outOfRange action=search");
         Move::walk(FORWARD, SEARCH_SPEED);
     }
     else
@@ -62,10 +59,12 @@ void loop()
 
         if (filteredDistance > STOP_DISTANCE_CM)
         {
+            Serial.println("[LOOP] branch=far action=walk");
             Move::walk(FORWARD, SEARCH_SPEED);
         }
         else
         {
+            Serial.println("[LOOP] branch=close action=stop");
             Move::walk(FORWARD, 0);
         }
 

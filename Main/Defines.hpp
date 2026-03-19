@@ -49,27 +49,3 @@
 #define LIGHT_REFRESH 15L  
 #define WHITE_LIMIT   25L
 
-// Mode
-#define MODE_CHASE    1
-#define MODE_SEEK     2
-#define MODE_ADJUST   3
-
-// Adjust
-#define ADJ_NONE      0b0000
-#define ADJ_FR        0b0001
-#define ADJ_FL        0b0010
-#define ADJ_BR        0b0100
-#define ADJ_BL        0b1000
-#define ADJ_FRONT     0b0011
-#define ADJ_BACK      0b1100
-#define ADJ_RIGHTS    0b0101
-#define ADJ_LEFTS     0b1010
-
-enum SeekMode
-{
-  SEEK_NONE     = 0b00,
-  SEEK_RIGHT    = 0b01,
-  SEEK_LEFT     = 0b10,
-  SEEK_BOTH     = 0b11,
-};
-
