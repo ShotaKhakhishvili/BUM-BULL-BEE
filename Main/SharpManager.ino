@@ -46,9 +46,9 @@ namespace
 
     float readMedian3(SharpIR& sensor)
     {
-        float a = (float)sensor.distance();
-        float b = (float)sensor.distance();
-        float c = (float)sensor.distance();
+        float a = (float)sensor.getDistance();
+        float b = (float)sensor.getDistance();
+        float c = (float)sensor.getDistance();
 
         sort3(a, b, c);
         return b;
