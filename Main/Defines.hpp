@@ -3,10 +3,14 @@
 
 // ------------------- SHARP MODULE START ---------------
 
-#define IR_M PA3
-#define IR_L PA7
-#define IR_R PA6
-#define MODEL 1080   // GP2Y0A21 (10–80 cm sensor)
+
+#define IR_SML PA2
+#define IR_M   PA3
+#define IR_L   PA7
+#define IR_R   PA6
+
+#define MODEL_SHORT 20150   // GP2Y0A41SK0F : 2–15 cm
+#define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 
 // ------------------- SHARP MODULE END -----------------
 
