@@ -41,6 +41,8 @@ void setup()
 
 void loop()
 {
+    digitalWrite(LED, HIGH);
+
     ForwardDistanceResult forward = SharpManager::readForward();
 
     if (forward.tooClose)
