@@ -10,13 +10,13 @@ void Move::rotateOnSide(bool dir, int str)
 {
   if(dir)
   {
-    L.setRotation(0, str);
-    R.setRotation(1, 0);
+    L.setRotation(BACKWARD, str);
+    R.setRotation(FORWARD, 0);
   }
   else
   {
-    L.setRotation(1, 0);
-    R.setRotation(0, str);
+    L.setRotation(FORWARD, 0);
+    R.setRotation(BACKWARD, str);
   }
 }
 void Move::walk(bool dir, int str)

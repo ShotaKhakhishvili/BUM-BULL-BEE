@@ -1,8 +1,10 @@
 #pragma once
+
+#include <Arduino.h>
+
 #define LED           PC13
 
 // ------------------- SHARP MODULE START ---------------
-
 
 #define IR_SML PA2
 #define IR_M   PA3

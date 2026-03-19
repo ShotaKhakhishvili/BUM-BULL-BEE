@@ -1,9 +1,6 @@
 #include "Defines.hpp"
-#include "ModeHandler.hpp"
-#include "MoveHandler.hpp"
 #include "Move.hpp"
 #include "Light.hpp"
-#include "Extra.hpp"
 #include "SharpManager.hpp"
 
 #include <Arduino.h>
@@ -18,11 +15,7 @@ int adjMode = ADJ_NONE;
 SeekMode seekMode = SeekMode::SEEK_NONE;
 
 // Moves
-int lastMoveCheck = 0;
-int moveTime = 0;
-
-bool reset = 0;
-int lastPrint = 0;
+unsigned long lastPrint = 0;
 
 // Tuning
 static constexpr float STOP_DISTANCE_CM = 15.0f;
@@ -48,7 +41,6 @@ void setup()
 
     SharpManager::init();
 
-    lastMoveCheck = millis();
     lastPrint = millis();
 }
 

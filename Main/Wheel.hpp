@@ -6,8 +6,6 @@ private:
   bool dir = false;
   int forward,backward;
 
-  bool lastCol = BLACK;
-
 public:
 
   Wheel(int forwardIn, int backwardIn);

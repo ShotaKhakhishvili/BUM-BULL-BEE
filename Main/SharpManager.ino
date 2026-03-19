@@ -18,10 +18,6 @@ namespace
     SharpIR sharpForwardShort(IR_SML, MODEL_SHORT);
     SharpIR sharpForwardLong(IR_M, MODEL_LONG);
 
-    // Optional side sensors if needed later
-    SharpIR sharpLeft(IR_L, MODEL_LONG);
-    SharpIR sharpRight(IR_R, MODEL_LONG);
-
     static constexpr float SHORT_MIN_VALID = 2.0f;
     static constexpr float SHORT_MAX_VALID = 15.0f;
 
