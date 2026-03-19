@@ -6,11 +6,11 @@
 #include <math.h>
 
 #ifndef MODEL_SHORT
-#define MODEL_SHORT 20150   // GP2Y0A41SK0F : 2..15 cm
+#define MODEL_SHORT GP2Y0A51SK0F   // GP2Y0A51SK0F : 2..15 cm
 #endif
 
 #ifndef MODEL_LONG
-#define MODEL_LONG 1080     // GP2Y0A21YK0F : 10..80 cm
+#define MODEL_LONG GP2Y0A21YK0F     //    : 10..80 cm
 #endif
 
 namespace
