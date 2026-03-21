@@ -28,6 +28,8 @@ namespace SharpManager
     static double distanceLongCm = 1000.0;
     static double distanceShortCm = 1000.0;
     static double selectedDistanceCm = 1000.0;
+    
+    static constexpr bool useDerivativeSuggestion = false;
 
     static SharpMode currentMode = SharpMode::LONG;
 
@@ -109,6 +111,9 @@ namespace SharpManager
         RefreshModeByDistance();
         RefreshSelectedDistance();
 
+        if(!useDerivativeSuggestion)
+            return;
+        
         if (currentMode == SharpMode::LONG)
         {
             if (SharpSuggest::ShouldSuggestShortFromLong())
