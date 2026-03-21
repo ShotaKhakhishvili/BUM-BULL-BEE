@@ -41,36 +41,20 @@ void setup()
 
 void loop()
 {
-    ForwardDistanceResult forward = SharpManager::readForward();
+    SharpManager::Update();
 
-    if (forward.tooClose)
-    {
-        digitalWrite(LED, LOW);
-        Move::walk(FORWARD, 0);
-    }
-    else if (forward.outOfRange)
-    {
-        Move::walk(FORWARD, SEARCH_SPEED);
-    }
-    else
-    {
-        float filteredDistance = SharpManager::filterForwardDistance(forward.fusedCm);
-
-        if (filteredDistance > STOP_DISTANCE_CM)
-        {
-            Serial.println("[LOOP] branch=far action=walk");
-            Move::walk(FORWARD, SEARCH_SPEED);
-        }
-        else
-        {
-            Serial.println("[LOOP] branch=close action=stop");
-            Move::walk(FORWARD, 0);
-        }
-
-        if (millis() - lastPrint >= 60)   // fast enough but not too spammy
-        {
-            SharpManager::printForwardResult(forward, filteredDistance);
-            lastPrint = millis();
-        }
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
