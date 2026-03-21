@@ -1,15 +1,21 @@
 #pragma once
 
-#include <Arduino.h>
+#include "SharpMode.hpp"
 
 namespace SharpManager
 {
-    enum class SharpMode
-    {
-        SHORT, LONG
-    }
-
-    void SuggestUpdate();
-    void RefreshMode();
     void Init();
+    void Update();
+
+    double GetSelectedDistance();
+    double GetLongDistance();
+    double GetShortDistance();
+
+    int GetLongRawAdc();
+    int GetShortRawAdc();
+
+    SharpMode GetMode();
+
+    int GetLongAnomalyScore();
+    int GetShortAnomalyScore();
 }

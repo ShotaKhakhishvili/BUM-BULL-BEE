@@ -9,11 +9,8 @@
 Light FR(COL1, false), FL(COL2, false), BR(COL3, false), BL(COL4, false);
 Light* lights[] = { &FR, &FL, &BR, &BL };
 
-// Moves
-unsigned long lastPrint = 0;
-
 // Tuning
-static constexpr float STOP_DISTANCE_CM = 15.0f;
+static constexpr float STOP_DISTANCE_CM = 5.0f;
 static constexpr int SEARCH_SPEED = 100;
 
 void setup()
@@ -34,9 +31,7 @@ void setup()
 
     pinMode(RESET, INPUT);
 
-    SharpManager::init();
-
-    lastPrint = millis();
+    SharpManager::Init();
 }
 
 void loop()
