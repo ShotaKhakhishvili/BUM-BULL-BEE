@@ -1,14 +1,10 @@
 #include "Defines.hpp"
 #include <Arduino.h>
 
-static constexpr int LONG_PIN  = A0;
-static constexpr int SHORT_PIN = A1;
-
 static constexpr int SAMPLE_COUNT = 101;
 
 static int longSamples[SAMPLE_COUNT];
 static int shortSamples[SAMPLE_COUNT];
-
 static int sampleIndex = 0;
 
 double AdcToVoltage(int raw)
@@ -54,7 +50,6 @@ void PrintMedian()
 
     Serial.print("L_RAW:");
     Serial.print(medianLong);
-
     Serial.print(" L_V:");
     Serial.print(longV, 3);
 
@@ -62,7 +57,6 @@ void PrintMedian()
 
     Serial.print("S_RAW:");
     Serial.print(medianShort);
-
     Serial.print(" S_V:");
     Serial.println(shortV, 3);
 }
@@ -74,16 +68,16 @@ void setup()
     pinMode(LED, OUTPUT);
     pinMode(RESET, INPUT);
 
-    pinMode(LONG_PIN, INPUT);
-    pinMode(SHORT_PIN, INPUT);
+    pinMode(IR_M, INPUT);
+    pinMode(IR_SML, INPUT);
 
     sampleIndex = 0;
 }
 
 void loop()
 {
-    const int rawLong  = analogRead(LONG_PIN);
-    const int rawShort = analogRead(SHORT_PIN);
+    const int rawLong  = analogRead(IR_M);
+    const int rawShort = analogRead(IR_SML);
 
     if (sampleIndex < SAMPLE_COUNT)
     {
