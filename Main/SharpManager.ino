@@ -101,7 +101,7 @@ namespace SharpManager
         UpdateLongSensor(now);
         UpdateShortSensor(now);
 
-        SharpSuggest::Update(currentMode, rawLongAdc, rawShortAdc);
+        SharpSuggest::Update(rawLongAdc, rawShortAdc);
 
         RefreshSelectedDistance();
         RefreshModeByDistance();

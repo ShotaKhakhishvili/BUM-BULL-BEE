@@ -1,96 +1,50 @@
 #include "Defines.hpp"
+#include "Move.hpp"
+#include "Light.hpp"
+#include "SharpManager.hpp"
+#include "CloseIR.hpp"
+#include "MedianCalculator.hpp"
+
 #include <Arduino.h>
 
-static constexpr int SAMPLE_COUNT = 101;
-
-static int longSamples[SAMPLE_COUNT];
-static int shortSamples[SAMPLE_COUNT];
-static int sampleIndex = 0;
-
-double AdcToVoltage(int raw)
-{
-    return (static_cast<double>(raw) * 5.0) / 1023.0;
-}
-
-int ComputeMedian(const int* arr, int count)
-{
-    static int sorted[SAMPLE_COUNT];
-
-    for (int i = 0; i < count; ++i)
-        sorted[i] = arr[i];
-
-    for (int i = 1; i < count; ++i)
-    {
-        int key = sorted[i];
-        int j = i - 1;
-
-        while (j >= 0 && sorted[j] > key)
-        {
-            sorted[j + 1] = sorted[j];
-            --j;
-        }
-
-        sorted[j + 1] = key;
-    }
-
-    return sorted[count / 2];
-}
-
-void PrintMedian()
-{
-    const int medianLong  = ComputeMedian(longSamples, SAMPLE_COUNT);
-    const int medianShort = ComputeMedian(shortSamples, SAMPLE_COUNT);
-
-    const double longV  = AdcToVoltage(medianLong);
-    const double shortV = AdcToVoltage(medianShort);
-
-    Serial.print("MED(");
-    Serial.print(SAMPLE_COUNT);
-    Serial.print(") ");
-
-    Serial.print("L_RAW:");
-    Serial.print(medianLong);
-    Serial.print(" L_V:");
-    Serial.print(longV, 3);
-
-    Serial.print(" || ");
-
-    Serial.print("S_RAW:");
-    Serial.print(medianShort);
-    Serial.print(" S_V:");
-    Serial.println(shortV, 3);
-}
+// Color Sensors
+Light FR(COL1, false), FL(COL2, false), BR(COL3, false), BL(COL4, false);
+Light* lights[] = { &FR, &FL, &BR, &BL };
 
 void setup()
 {
     Serial.begin(115200);
 
     pinMode(LED, OUTPUT);
+
+    pinMode(COL1, INPUT);
+    pinMode(COL2, INPUT);
+    pinMode(COL3, INPUT);
+    pinMode(COL4, INPUT);
+
+    pinMode(WH_LF, OUTPUT);
+    pinMode(WH_LB, OUTPUT);
+    pinMode(WH_RF, OUTPUT);
+    pinMode(WH_RB, OUTPUT);
+
     pinMode(RESET, INPUT);
 
+    pinMode(IR_CLOSE_A, INPUT);
     pinMode(IR_M, INPUT);
     pinMode(IR_SML, INPUT);
+    pinMode(IR_L, INPUT);
+    pinMode(IR_R, INPUT);
 
-    sampleIndex = 0;
+    SharpManager::Init();
+    CloseIR::Init();
 }
 
 void loop()
 {
-    const int rawLong  = analogRead(IR_M);
-    const int rawShort = analogRead(IR_SML);
+    SharpManager::Update();
+    CloseIR::Update();
 
-    if (sampleIndex < SAMPLE_COUNT)
-    {
-        longSamples[sampleIndex]  = rawLong;
-        shortSamples[sampleIndex] = rawShort;
-        ++sampleIndex;
-    }
-
-    if (sampleIndex >= SAMPLE_COUNT)
-    {
-        PrintMedian();
-        sampleIndex = 0;
-    }
+    MedianCalculator::Update(SharpManager::GetShortRawAdc(), SharpManager::GetLongRawAdc());
 
     delay(5);
 }

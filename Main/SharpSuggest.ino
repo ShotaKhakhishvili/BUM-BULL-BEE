@@ -166,7 +166,7 @@ namespace SharpSuggest
         ResetState(shortState);
     }
 
-    void Update(SharpMode currentMode, int rawLongAdc, int rawShortAdc)
+    void Update(int rawLongAdc, int rawShortAdc)
     {
         UpdateTrend(longState, rawLongAdc);
         UpdateTrend(shortState, rawShortAdc);

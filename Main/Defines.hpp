@@ -38,8 +38,8 @@
 
 #define RIGHT         false
 #define LEFT          true
-#define FORWARD       false
-#define BACKWARD      true
+#define FORWARD       true
+#define BACKWARD      false
 #define WHITE         0
 #define BLACK         1
 
