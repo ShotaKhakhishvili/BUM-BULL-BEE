@@ -6,13 +6,14 @@
 
 // ------------------- DISTANCE SENSORS ----------------------
 
-#define IR_CLOSE_A  A2
+#define IR_CLOSE_A  PA1
 #define IR_M        PA3
 #define IR_L        PA7
 #define IR_R        PA6
+#define IR_SML      PA2
 
-#define MODEL_SHORT GP2Y0A51SK0F    // GP2Y0A41SK0F : 2–15 cm
-#define MODEL_LONG  GP2Y0A21YK0F    // GP2Y0A21YK0F : 10–80 cm
+#define MODEL_SHORT 20150    // GP2Y0A41SK0F : 2–15 cm
+#define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 
 // -------------------- WHEELS -------------------------------
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SharpMode.hpp"
+#include "SharpSuggest.hpp"
 
 namespace SharpManager
 {
