@@ -1,12 +1,6 @@
 #pragma once
 
-// #include "SharpMode.hpp"
-
-enum class SharpMode
-{
-    LONG,
-    SHORT
-};
+enum class SharpMode;
 
 namespace SharpSuggest
 {

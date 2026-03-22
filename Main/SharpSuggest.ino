@@ -1,4 +1,5 @@
 #include "SharpSuggest.hpp"
+#include "SharpManager.hpp"
 
 #include <Arduino.h>
 #include <stdlib.h>

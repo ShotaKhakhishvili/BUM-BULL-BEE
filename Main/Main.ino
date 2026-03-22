@@ -14,6 +14,8 @@ Light* lights[] = { &FR, &FL, &BR, &BL };
 static constexpr float STOP_DISTANCE_CM = 5.0f;
 static constexpr int SEARCH_SPEED = 100;
 
+static constexpr unsigned long PRINT_INTERVAL_MS = 100;
+
 void setup()
 {
     Serial.begin(115200);
@@ -39,43 +41,28 @@ void setup()
 void loop()
 {
     SharpManager::Update();
-    CloseIR::Update();
 
     static unsigned long lastPrint = 0;
 
-    if (millis() - lastPrint >= 100)
+    if (millis() - lastPrint >= PRINT_INTERVAL_MS)
     {
         lastPrint = millis();
 
-        Serial.print("Mode: ");
-        Serial.print(SharpManager::GetMode() == SharpMode::LONG ? "LONG" : "SHORT");
+        const int rawLong  = SharpManager::GetLongRawAdc();
+        const int rawShort = SharpManager::GetShortRawAdc();
 
-        Serial.print(" | Dist: ");
-        Serial.print(SharpManager::GetSelectedDistance());
+        const double longVoltage  = SharpManager::AdcToVoltage(rawLong);
+        const double shortVoltage = SharpManager::AdcToVoltage(rawShort);
 
-        Serial.print(" | Long: ");
-        Serial.print(SharpManager::GetLongDistance());
+        Serial.print("LONG_ADC: ");
+        Serial.print(rawLong);
+        Serial.print(" | LONG_V: ");
+        Serial.print(longVoltage, 3);
 
-        Serial.print(" | Short: ");
-        Serial.print(SharpManager::GetShortDistance());
-
-        Serial.print(" | RawLong: ");
-        Serial.print(SharpManager::GetLongRawAdc());
-
-        Serial.print(" | RawShort: ");
-        Serial.print(SharpManager::GetShortRawAdc());
-
-        Serial.print(" | IR_Close: ");
-        Serial.print(CloseIR::GetRawAdc());
-
-        Serial.print(" | Sees: ");
-        Serial.print(CloseIR::SeesObject() ? "YES" : "NO");
-
-        Serial.print(" | LongScore: ");
-        Serial.print(SharpManager::GetLongAnomalyScore());
-
-        Serial.print(" | ShortScore: ");
-        Serial.print(SharpManager::GetShortAnomalyScore());
+        Serial.print(" || SHORT_ADC: ");
+        Serial.print(rawShort);
+        Serial.print(" | SHORT_V: ");
+        Serial.print(shortVoltage, 3);
 
         Serial.println();
     }

@@ -3,13 +3,9 @@
 #include "Defines.hpp"
 
 #include <Arduino.h>
-#include <SharpIR.h>
 
 namespace SharpManager
 {
-    SharpIR sharpForwardShort(IR_SML, MODEL_SHORT);
-    SharpIR sharpForwardLong(IR_M, MODEL_LONG);
-
     static constexpr double switchToLong  = 13.5;
     static constexpr double switchToShort = 11.5;
 
@@ -61,7 +57,7 @@ namespace SharpManager
         {
             rawLongAdc = analogRead(IR_M);
 
-            const double newDistance = sharpForwardLong.getDistance();
+            const double newDistance = GetRawLongDistance();
             distanceLongCm = distanceLongCm * (1.0 - alphaLong) + newDistance * alphaLong;
 
             lastLongRead = now;
@@ -74,7 +70,7 @@ namespace SharpManager
         {
             rawShortAdc = analogRead(IR_SML);
 
-            const double newDistance = sharpForwardShort.getDistance();
+            const double newDistance = GetRawShortDistance();   
             distanceShortCm = distanceShortCm * (1.0 - alphaShort) + newDistance * alphaShort;
 
             lastShortRead = now;
@@ -89,8 +85,8 @@ namespace SharpManager
         rawLongAdc  = analogRead(IR_M);
         rawShortAdc = analogRead(IR_SML);
 
-        distanceLongCm  = sharpForwardLong.getDistance();
-        distanceShortCm = sharpForwardShort.getDistance();
+        distanceLongCm  = GetRawLongDistance();
+        distanceShortCm = GetRawShortDistance();
 
         currentMode = SharpMode::LONG;
         RefreshSelectedDistance();
@@ -166,5 +162,20 @@ namespace SharpManager
     int GetShortAnomalyScore()
     {
         return SharpSuggest::GetShortAnomalyScore();
+    }
+
+    double GetRawLongDistance()
+    {
+        return ConvertLongVoltageToDistance(AdcToVoltage(rawLongAdc));
+    }
+
+    double GetRawShortDistance()
+    {
+        return ConvertShortVoltageToDistance(AdcToVoltage(rawShortAdc));
+    }
+
+    double AdcToVoltage(int adc)
+    {
+        return (adc / 1023.0) * 5.0;
     }
 }

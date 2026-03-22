@@ -1,6 +1,16 @@
 #pragma once
 
-#include "SharpSuggest.hpp"
+enum class SharpMode
+{
+    LONG,
+    SHORT
+};
+
+struct SamplePoint
+{
+    double distanceCm;
+    double voltage;
+};
 
 namespace SharpManager
 {
@@ -11,6 +21,9 @@ namespace SharpManager
     double GetLongDistance();
     double GetShortDistance();
 
+    double GetRawLongDistance();
+    double GetRawShortDistance();
+
     int GetLongRawAdc();
     int GetShortRawAdc();
 
@@ -18,4 +31,9 @@ namespace SharpManager
 
     int GetLongAnomalyScore();
     int GetShortAnomalyScore();
+
+    double ConvertLongVoltageToDistance(double voltage);
+    double ConvertShortVoltageToDistance(double voltage);
+
+    double AdcToVoltage(int adc);
 }
