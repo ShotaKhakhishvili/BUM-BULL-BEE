@@ -14,7 +14,7 @@ Light* lights[] = { &FR, &FL, &BR, &BL };
 static constexpr float STOP_DISTANCE_CM = 5.0f;
 static constexpr int SEARCH_SPEED = 100;
 
-static constexpr unsigned long PRINT_INTERVAL_MS = 100;
+static constexpr int TUNING_SAMPLE_COUNT = 20;
 
 void setup()
 {
@@ -42,29 +42,29 @@ void loop()
 {
     SharpManager::Update();
 
-    static unsigned long lastPrint = 0;
-
-    if (millis() - lastPrint >= PRINT_INTERVAL_MS)
+    if (SharpManager::IsAverageReady())
     {
-        lastPrint = millis();
-
-        const int rawLong  = SharpManager::GetLongRawAdc();
-        const int rawShort = SharpManager::GetShortRawAdc();
+        const int rawLong  = SharpManager::GetAveragedLong();
+        const int rawShort = SharpManager::GetAveragedShort();
 
         const double longVoltage  = SharpManager::AdcToVoltage(rawLong);
         const double shortVoltage = SharpManager::AdcToVoltage(rawShort);
+
+        Serial.print("AVG(");
+        Serial.print(TUNING_SAMPLE_COUNT);
+        Serial.print(") ");
 
         Serial.print("LONG_ADC: ");
         Serial.print(rawLong);
         Serial.print(" | LONG_V: ");
         Serial.print(longVoltage, 3);
 
-        Serial.print(" || SHORT_ADC: ");
+        Serial.print(" || ");
+
+        Serial.print("SHORT_ADC: ");
         Serial.print(rawShort);
         Serial.print(" | SHORT_V: ");
-        Serial.print(shortVoltage, 3);
-
-        Serial.println();
+        Serial.println(shortVoltage, 3);
     }
 }
 
