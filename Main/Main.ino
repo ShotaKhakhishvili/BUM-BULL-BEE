@@ -1,26 +1,88 @@
 #include "Defines.hpp"
-#include "Move.hpp"
-#include "Light.hpp"
-#include "SharpManager.hpp"
-#include "CloseIR.hpp"
-
 #include <Arduino.h>
 
-// Color Sensors
-Light FR(COL1, false), FL(COL2, false), BR(COL3, false), BL(COL4, false);
-Light* lights[] = { &FR, &FL, &BR, &BL };
+static constexpr int LONG_PIN  = A0;
+static constexpr int SHORT_PIN = A1;
 
-// Tuning
-static constexpr float STOP_DISTANCE_CM = 5.0f;
-static constexpr int SEARCH_SPEED = 100;
+static constexpr int LED_PIN   = 13;
 
-static constexpr int TUNING_SAMPLE_COUNT = 20;
+static constexpr int SAMPLE_COUNT = 21; // luwi dasvi aq
+
+
+static int longSamples[SAMPLE_COUNT];
+static int shortSamples[SAMPLE_COUNT];
+
+static int sampleIndex = 0;
+
+
+double AdcToVoltage(int raw)
+{
+    return raw * (5.0 / 1023.0); 
+}
+
+int ComputeMedian(int* arr, int count)
+{
+    static int sorted[SAMPLE_COUNT];
+
+    // copy
+    for (int i = 0; i < count; ++i)
+        sorted[i] = arr[i];
+
+    // insertion sort
+    for (int i = 1; i < count; ++i)
+    {
+        int key = sorted[i];
+        int j = i - 1;
+
+        while (j >= 0 && sorted[j] > key)
+        {
+            sorted[j + 1] = sorted[j];
+            --j;
+        }
+
+        sorted[j + 1] = key;
+    }
+
+    return sorted[count / 2]; // odd count assumed
+}
+
+// ------------------- PRINT -------------------
+
+void PrintMedian()
+{
+    int medianLong  = ComputeMedian(longSamples, SAMPLE_COUNT);
+    int medianShort = ComputeMedian(shortSamples, SAMPLE_COUNT);
+
+    double longV  = AdcToVoltage(medianLong);
+    double shortV = AdcToVoltage(medianShort);
+
+    Serial.print("MED(");
+    Serial.print(SAMPLE_COUNT);
+    Serial.print(") ");
+
+    Serial.print("L_ADC:");
+    Serial.print(medianLong);
+    Serial.print(" L_V:");
+    Serial.print(longV, 3);
+
+    Serial.print(" || ");
+
+    Serial.print("S_ADC:");
+    Serial.print(medianShort);
+    Serial.print(" S_V:");
+    Serial.println(shortV, 3);
+}
 
 void setup()
 {
     Serial.begin(115200);
 
     pinMode(LED, OUTPUT);
+    pinMode(RESET, INPUT);
+
+    pinMode(LONG_PIN, INPUT);
+    pinMode(SHORT_PIN, INPUT);
+    pinMode(LED_PIN, OUTPUT);
 
     pinMode(COL1, INPUT);
     pinMode(COL2, INPUT);
@@ -32,52 +94,27 @@ void setup()
     pinMode(WH_RF, OUTPUT);
     pinMode(WH_RB, OUTPUT);
 
-    pinMode(RESET, INPUT);
-
-    SharpManager::Init();
-    CloseIR::Init();
+    sampleIndex = 0;
 }
 
 void loop()
 {
-    SharpManager::Update();
+    // read sensors
+    int rawLong  = analogRead(LONG_PIN);
+    int rawShort = analogRead(SHORT_PIN);
 
-    if (SharpManager::IsAverageReady())
+    if (sampleIndex < SAMPLE_COUNT)
     {
-        const int rawLong  = SharpManager::GetAveragedLong();
-        const int rawShort = SharpManager::GetAveragedShort();
-
-        const double longVoltage  = SharpManager::AdcToVoltage(rawLong);
-        const double shortVoltage = SharpManager::AdcToVoltage(rawShort);
-
-        Serial.print("AVG(");
-        Serial.print(TUNING_SAMPLE_COUNT);
-        Serial.print(") ");
-
-        Serial.print("LONG_ADC: ");
-        Serial.print(rawLong);
-        Serial.print(" | LONG_V: ");
-        Serial.print(longVoltage, 3);
-
-        Serial.print(" || ");
-
-        Serial.print("SHORT_ADC: ");
-        Serial.print(rawShort);
-        Serial.print(" | SHORT_V: ");
-        Serial.println(shortVoltage, 3);
+        longSamples[sampleIndex]  = rawLong;
+        shortSamples[sampleIndex] = rawShort;
+        sampleIndex++;
     }
+
+    if (sampleIndex >= SAMPLE_COUNT)
+    {
+        PrintMedian();
+        sampleIndex = 0;
+    }
+
+    delay(2);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
