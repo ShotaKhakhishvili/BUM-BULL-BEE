@@ -2,6 +2,12 @@
 
 #include "SharpMode.hpp"
 
+enum class SharpMode
+{
+    LONG,
+    SHORT
+};
+
 namespace SharpSuggest
 {
     void Init();
