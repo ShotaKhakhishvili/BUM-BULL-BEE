@@ -44,7 +44,8 @@ void loop()
     SharpManager::Update();
     CloseIR::Update();
 
-    MedianCalculator::Update(SharpManager::GetShortRawAdc(), SharpManager::GetLongRawAdc());
+    MedianCalculator::Update(SharpManager::AdcToVoltage(SharpManager::GetShortRawAdc()), 
+                            SharpManager::AdcToVoltage(SharpManager::GetLongRawAdc()));
 
     delay(5);
 }

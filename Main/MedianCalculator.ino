@@ -8,10 +8,10 @@ namespace MedianCalculator
 
     int CURRENT_SAMPLE_INDEX = 0;
 
-    int SAMPLES_SHORT[SAMPLE_SIZE] = {};
-    int SAMPLES_LONG[SAMPLE_SIZE] = {};
+    double SAMPLES_SHORT[SAMPLE_SIZE] = {};
+    double SAMPLES_LONG[SAMPLE_SIZE] = {};
     
-    void Update(const int newShortValue, const int newLongValue)
+    void Update(const double newShortValue, const double newLongValue)
     {
         if (CURRENT_SAMPLE_INDEX < SAMPLE_SIZE)
         {
@@ -26,11 +26,11 @@ namespace MedianCalculator
         }
     }
 
-    int ComputeMedian(int* values, int count)
+    double ComputeMedian(double* values, int count)
     {
         for (int i = 1; i < count; ++i)
         {
-            int key = values[i];
+            double key = values[i];
             int j = i - 1;
 
             while (j >= 0 && values[j] > key)
@@ -46,8 +46,8 @@ namespace MedianCalculator
 
     void PrintMedians()
     {
-        int shortMedian = ComputeMedian(SAMPLES_SHORT, SAMPLE_SIZE);
-        int longMedian = ComputeMedian(SAMPLES_LONG, SAMPLE_SIZE);
+        double shortMedian = ComputeMedian(SAMPLES_SHORT, SAMPLE_SIZE);
+        double longMedian = ComputeMedian(SAMPLES_LONG, SAMPLE_SIZE);
 
         Serial.print("Short Median: ");
         Serial.print(shortMedian);
