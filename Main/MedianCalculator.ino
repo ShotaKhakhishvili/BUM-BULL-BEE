@@ -3,7 +3,7 @@
 
 namespace MedianCalculator
 {
-    int ComputeMedian(int* values, int count);
+    double ComputeMedian(const double* values, int count);
     void PrintMedians();
 
     int CURRENT_SAMPLE_INDEX = 0;
@@ -26,22 +26,35 @@ namespace MedianCalculator
         }
     }
 
-    double ComputeMedian(double* values, int count)
+    double ComputeMedian(const double* values, int count)
     {
+        if (count <= 0)
+            return 0.0;
+
+        if (count > SAMPLE_SIZE)
+            count = SAMPLE_SIZE;
+
+        double sorted[SAMPLE_SIZE];
+        for (int i = 0; i < count; ++i)
+            sorted[i] = values[i];
+
         for (int i = 1; i < count; ++i)
         {
-            double key = values[i];
+            double key = sorted[i];
             int j = i - 1;
 
-            while (j >= 0 && values[j] > key)
+            while (j >= 0 && sorted[j] > key)
             {
-                values[j + 1] = values[j];
+                sorted[j + 1] = sorted[j];
                 --j;
             }
-            values[j + 1] = key;
+            sorted[j + 1] = key;
         }
 
-        return values[count / 2];
+        if ((count % 2) == 1)
+            return sorted[count / 2];
+
+        return (sorted[(count / 2) - 1] + sorted[count / 2]) / 2.0;
     }
 
     void PrintMedians()
@@ -54,6 +67,5 @@ namespace MedianCalculator
 
         Serial.print(" | Long Median: ");
         Serial.println(longMedian);
-        CURRENT_SAMPLE_INDEX = 0;
     }
 }
