@@ -6,7 +6,7 @@
 
 // Debug
 
-#define kPrintDigitsAfterDecimal 5
+#define kPrintDigitsAfterDecimal 3
 
 // ------------------- DISTANCE SENSORS ----------------------
 
@@ -50,6 +50,6 @@
 #define DEL           delay(1000)
 
 #define MAX_DISTANCE  65
-#define LIGHT_REFRESH 15L  
+#define LIGHT_REFRESH 15L
 #define WHITE_LIMIT   25L
 
