@@ -1,4 +1,6 @@
 #include "MedianCalculator.hpp"
+#include "Defines.hpp"
+
 #include <Arduino.h>
 
 namespace MedianCalculator
@@ -57,15 +59,15 @@ namespace MedianCalculator
         return (sorted[(count / 2) - 1] + sorted[count / 2]) / 2.0;
     }
 
-    void PrintMedians()
-    {
-        double shortMedian = ComputeMedian(SAMPLES_SHORT, SAMPLE_SIZE);
-        double longMedian = ComputeMedian(SAMPLES_LONG, SAMPLE_SIZE);
+void PrintMedians()
+{
+    double shortMedian = ComputeMedian(SAMPLES_SHORT, SAMPLE_SIZE);
+    double longMedian = ComputeMedian(SAMPLES_LONG, SAMPLE_SIZE);
 
-        Serial.print("Short Median: ");
-        Serial.print(shortMedian);
+    Serial.print("Short Median: ");
+    Serial.print(shortMedian, kPrintDigitsAfterDecimal);
 
-        Serial.print(" | Long Median: ");
-        Serial.println(longMedian);
-    }
+    Serial.print(" | Long Median: ");
+    Serial.println(longMedian, kPrintDigitsAfterDecimal);
+}
 }

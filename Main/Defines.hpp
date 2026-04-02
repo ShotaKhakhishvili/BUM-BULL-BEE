@@ -4,6 +4,10 @@
 
 #define LED           PC13
 
+// Debug
+
+#define kPrintDigitsAfterDecimal 5
+
 // ------------------- DISTANCE SENSORS ----------------------
 
 #define IR_CLOSE_A  PA1
