@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;hardwareinitialization&apos; to &apos;4wheel&apos;" description="Rename resource &apos;hardwareinitialization&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/hardwareinitialization" name="4wheel" stamp="1775840831904" updateReferences="true"/>
+</session>
