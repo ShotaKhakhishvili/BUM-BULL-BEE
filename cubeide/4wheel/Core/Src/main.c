@@ -47,6 +47,8 @@
 
 /* USER CODE BEGIN PV */
 volatile uint16_t adc_raw[4] = {0};
+volatile uint16_t adc_mv[4] = {0};
+volatile uint16_t pwm_duty[4] = {0};
 
 /* USER CODE END PV */
 
@@ -108,15 +110,20 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-    uint32_t duty_ch1 = (adc_raw[0] * 199U) / 4095U;
-    uint32_t duty_ch2 = (adc_raw[1] * 199U) / 4095U;
-    uint32_t duty_ch3 = (adc_raw[2] * 199U) / 4095U;
-    uint32_t duty_ch4 = (adc_raw[3] * 199U) / 4095U;
+    adc_mv[0] = (uint16_t)((adc_raw[0] * 3300U) / 4095U);
+    adc_mv[1] = (uint16_t)((adc_raw[1] * 3300U) / 4095U);
+    adc_mv[2] = (uint16_t)((adc_raw[2] * 3300U) / 4095U);
+    adc_mv[3] = (uint16_t)((adc_raw[3] * 3300U) / 4095U);
 
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty_ch1);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, duty_ch2);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, duty_ch3);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, duty_ch4);
+    pwm_duty[0] = (uint16_t)((adc_raw[0] * 199U) / 4095U);
+    pwm_duty[1] = (uint16_t)((adc_raw[1] * 199U) / 4095U);
+    pwm_duty[2] = (uint16_t)((adc_raw[2] * 199U) / 4095U);
+    pwm_duty[3] = (uint16_t)((adc_raw[3] * 199U) / 4095U);
+
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, pwm_duty[0]);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, pwm_duty[1]);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, pwm_duty[2]);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, pwm_duty[3]);
 
     HAL_Delay(10);
     /* USER CODE BEGIN 3 */
