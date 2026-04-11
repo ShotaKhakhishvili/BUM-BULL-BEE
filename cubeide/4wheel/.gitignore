@@ -1,0 +1,20 @@
+# STM32CubeIDE build/intermediate outputs
+/Debug/
+/Release/
+
+# Generated object/dependency/analysis artifacts
+*.o
+*.obj
+*.d
+*.su
+*.cyclo
+
+# Generated link/map/list artifacts
+*.a
+*.map
+*.list
+
+# Generated firmware images
+*.elf
+*.bin
+*.hex
