@@ -150,3 +150,31 @@ COM9
 
 !ENTRY org.eclipse.cdt.core 1 0 2026-04-10 21:51:13.587
 !MESSAGE Indexed 'hardwareinitialization' (24 sources, 113 headers) in 1,09 sec: 9 218 declarations; 50 148 references; 2 unresolved inclusions; 36 syntax errors; 188 unresolved names (0,32%)
+!SESSION 2026-04-11 20:08:42.347 -----------------------------------------------
+eclipse.buildId=Version 2.1.1
+java.version=21.0.9
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-04-11 20:08:52.208
+!MESSAGE Log4j2 initialized with config file D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-04-11 20:09:01.080
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-04-11 20:09:03.208
+!MESSAGE Executed PowerShell command powershell.exe -Command "Get-CimInstance -ClassName Win32_SerialPort | Select-Object -ExpandProperty DeviceID":
+COM4
+COM8
+COM9
+
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-04-11 20:09:03.208
+!MESSAGE port: COM4
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-04-11 20:09:03.209
+!MESSAGE port: COM8
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-04-11 20:09:03.209
+!MESSAGE port: COM9
