@@ -93,7 +93,10 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 100);
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 100);
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 100);
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,6 +108,20 @@ int main(void)
 
 	  // Wait for 500ms (0.5 seconds)
 	  HAL_Delay(500);
+
+	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
+	  HAL_Delay(20);   // 200 cycles at 10 kHz
+
+	  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+	  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+	  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+
+	  HAL_Delay(500);  // gap between bleeps
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
