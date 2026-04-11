@@ -46,6 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+volatile uint16_t adc_raw[4] = {0};
 
 /* USER CODE END PV */
 
@@ -93,6 +94,11 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
@@ -102,25 +108,17 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-    // Fade up: 0% -> 100% in 1 second
-    for (uint16_t duty = 0; duty <= 199; duty++)
-    {
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, duty);
-      HAL_Delay(5);   // 200 steps * 5 ms = 1000 ms
-    }
+    uint32_t duty_ch1 = (adc_raw[0] * 199U) / 4095U;
+    uint32_t duty_ch2 = (adc_raw[1] * 199U) / 4095U;
+    uint32_t duty_ch3 = (adc_raw[2] * 199U) / 4095U;
+    uint32_t duty_ch4 = (adc_raw[3] * 199U) / 4095U;
 
-    // Fade down: 100% -> 0% in 1 second
-    for (int16_t duty = 199; duty >= 0; duty--)
-    {
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, duty);
-      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, duty);
-      HAL_Delay(5);   // 200 steps * 5 ms = 1000 ms
-    }
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty_ch1);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, duty_ch2);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, duty_ch3);
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, duty_ch4);
+
+    HAL_Delay(10);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
