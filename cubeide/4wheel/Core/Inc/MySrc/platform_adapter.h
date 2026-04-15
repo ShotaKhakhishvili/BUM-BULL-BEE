@@ -42,7 +42,17 @@ typedef enum
 	PLATFORM_WHEEL_OUTPUT_LB = 3
 } PlatformWheelOutput;
 
+typedef enum
+{
+	PLATFORM_LIGHT_INPUT_COL1 = 0,
+	PLATFORM_LIGHT_INPUT_COL2 = 1,
+	PLATFORM_LIGHT_INPUT_COL3 = 2,
+	PLATFORM_LIGHT_INPUT_COL4 = 3,
+	PLATFORM_LIGHT_INPUT_RESET = 4
+} PlatformLightInput;
+
 void Platform_DelayMs(uint32_t ms);
 void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit);
+bool Platform_ReadDigitalInput(uint8_t input_id);
 
 #endif /* MYSRC_PLATFORM_ADAPTER_H */

@@ -9,6 +9,7 @@
 "./Core/Src/system_stm32f1xx.o"
 "./Core/Src/tim.o"
 "./Core/Src/MySrc/close_ir.o"
+"./Core/Src/MySrc/light.o"
 "./Core/Src/MySrc/median_calculator.o"
 "./Core/Src/MySrc/move.o"
 "./Core/Src/MySrc/platform_adapter.o"

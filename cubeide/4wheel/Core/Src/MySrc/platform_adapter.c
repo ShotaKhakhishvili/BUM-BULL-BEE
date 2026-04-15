@@ -78,3 +78,39 @@ void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit)
         break;
     }
 }
+
+bool Platform_ReadDigitalInput(uint8_t input_id)
+{
+    GPIO_TypeDef *port;
+    uint16_t pin;
+    GPIO_PinState state;
+
+    switch (input_id)
+    {
+    case PLATFORM_LIGHT_INPUT_COL1:
+        port = GPIOA;
+        pin = GPIO_PIN_15;
+        break;
+    case PLATFORM_LIGHT_INPUT_COL2:
+        port = GPIOB;
+        pin = GPIO_PIN_3;
+        break;
+    case PLATFORM_LIGHT_INPUT_COL3:
+        port = GPIOB;
+        pin = GPIO_PIN_5;
+        break;
+    case PLATFORM_LIGHT_INPUT_COL4:
+        port = GPIOB;
+        pin = GPIO_PIN_4;
+        break;
+    case PLATFORM_LIGHT_INPUT_RESET:
+        port = GPIOB;
+        pin = GPIO_PIN_13;
+        break;
+    default:
+        return false;
+    }
+
+    state = HAL_GPIO_ReadPin(port, pin);
+    return (state == GPIO_PIN_SET);
+}
