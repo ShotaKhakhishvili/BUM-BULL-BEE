@@ -34,4 +34,15 @@ uint16_t Platform_ReadIrCloseAdc(void);
 
 void Platform_DebugPrintMedians(double short_median, double long_median, uint8_t digits_after_decimal);
 
+typedef enum
+{
+	PLATFORM_WHEEL_OUTPUT_RB = 0,
+	PLATFORM_WHEEL_OUTPUT_RF = 1,
+	PLATFORM_WHEEL_OUTPUT_LF = 2,
+	PLATFORM_WHEEL_OUTPUT_LB = 3
+} PlatformWheelOutput;
+
+void Platform_DelayMs(uint32_t ms);
+void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit);
+
 #endif /* MYSRC_PLATFORM_ADAPTER_H */

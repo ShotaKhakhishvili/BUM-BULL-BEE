@@ -28,6 +28,7 @@
 
 #include "MySrc/close_ir.h"
 #include "MySrc/median_calculator.h"
+#include "MySrc/move.h"
 #include "MySrc/sharp_manager.h"
 
 /* USER CODE END Includes */
@@ -57,6 +58,7 @@ volatile uint16_t pwm_duty[4] = {0};
 static SharpManager g_sharp_manager;
 static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
+static Move g_move;
 
 /* USER CODE END PV */
 
@@ -117,6 +119,7 @@ int main(void)
   SharpManager_Init(&g_sharp_manager);
   CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
+  Move_Init(&g_move);
   /* USER CODE END 2 */
 
   /* Infinite loop */
