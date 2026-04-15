@@ -26,6 +26,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "MySrc/close_ir.h"
+#include "MySrc/median_calculator.h"
+#include "MySrc/sharp_manager.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,9 +50,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint16_t adc_raw[4] = {0};
-volatile uint16_t adc_mv[4] = {0};
+volatile uint16_t adc_raw[5] = {0};
+volatile uint16_t adc_mv[5] = {0};
 volatile uint16_t pwm_duty[4] = {0};
+
+static SharpManager g_sharp_manager;
+static CloseIR g_close_ir;
+static MedianCalculator g_median_calculator;
 
 /* USER CODE END PV */
 
@@ -96,7 +104,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -105,6 +113,10 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
+  SharpManager_Init(&g_sharp_manager);
+  CloseIR_Init(&g_close_ir);
+  MedianCalculator_Init(&g_median_calculator);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,11 +126,12 @@ int main(void)
     adc_mv[1] = (uint16_t)((adc_raw[1] * 3300U) / 4095U);
     adc_mv[2] = (uint16_t)((adc_raw[2] * 3300U) / 4095U);
     adc_mv[3] = (uint16_t)((adc_raw[3] * 3300U) / 4095U);
+    adc_mv[4] = (uint16_t)((adc_raw[4] * 3300U) / 4095U);
 
-    pwm_duty[0] = (uint16_t)((adc_raw[0] * 199U) / 4095U);
-    pwm_duty[1] = (uint16_t)((adc_raw[1] * 199U) / 4095U);
-    pwm_duty[2] = (uint16_t)((adc_raw[2] * 199U) / 4095U);
-    pwm_duty[3] = (uint16_t)((adc_raw[3] * 199U) / 4095U);
+    pwm_duty[0] = (uint16_t)((adc_raw[1] * 199U) / 4095U);
+    pwm_duty[1] = (uint16_t)((adc_raw[2] * 199U) / 4095U);
+    pwm_duty[2] = (uint16_t)((adc_raw[3] * 199U) / 4095U);
+    pwm_duty[3] = (uint16_t)((adc_raw[4] * 199U) / 4095U);
 
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, pwm_duty[0]);
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, pwm_duty[1]);
@@ -127,6 +140,13 @@ int main(void)
 
     HAL_Delay(10);
     /* USER CODE BEGIN 3 */
+    SharpManager_Update(&g_sharp_manager);
+    CloseIR_Update(&g_close_ir);
+
+    MedianCalculator_Update(
+        &g_median_calculator,
+        SharpManager_AdcToVoltage(SharpManager_GetShortRawAdc(&g_sharp_manager), 3.3, 4095.0),
+        SharpManager_AdcToVoltage(SharpManager_GetLongRawAdc(&g_sharp_manager), 3.3, 4095.0));
   }
   /* USER CODE END 3 */
 }

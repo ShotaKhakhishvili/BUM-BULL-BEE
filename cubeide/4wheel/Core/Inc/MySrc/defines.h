@@ -1,0 +1,13 @@
+#ifndef MYSRC_DEFINES_H
+#define MYSRC_DEFINES_H
+
+#include <stdint.h>
+
+#define BBB_PRINT_DIGITS_AFTER_DECIMAL 3U
+
+#define BBB_MODEL_SHORT 20150
+#define BBB_MODEL_LONG 1080
+
+#define BBB_MAX_DISTANCE_CM 65.0
+
+#endif /* MYSRC_DEFINES_H */
