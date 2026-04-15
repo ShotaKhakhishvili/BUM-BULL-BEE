@@ -1,6 +1,7 @@
 #ifndef MYSRC_PLATFORM_ADAPTER_H
 #define MYSRC_PLATFORM_ADAPTER_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifndef PLATFORM_ADC_CHANNEL_COUNT

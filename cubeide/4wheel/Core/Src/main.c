@@ -27,8 +27,10 @@
 /* USER CODE BEGIN Includes */
 
 #include "MySrc/close_ir.h"
+#include "MySrc/light.h"
 #include "MySrc/median_calculator.h"
 #include "MySrc/move.h"
+#include "MySrc/platform_adapter.h"
 #include "MySrc/sharp_manager.h"
 
 /* USER CODE END Includes */
@@ -52,19 +54,37 @@
 
 /* USER CODE BEGIN PV */
 volatile uint16_t adc_raw[5] = {0};
-volatile uint16_t adc_mv[5] = {0};
-volatile uint16_t pwm_duty[4] = {0};
 
 static SharpManager g_sharp_manager;
 static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
-static Move g_move;
+static Light g_fr;
+static Light g_fl;
+static Light g_br;
+static Light g_bl;
+
+static Light *g_lights[4] =
+{
+  &g_fr,
+  &g_fl,
+  &g_br,
+  &g_bl
+};
+
+static const uint8_t g_light_input_ids[4] =
+{
+  PLATFORM_LIGHT_INPUT_COL1,
+  PLATFORM_LIGHT_INPUT_COL2,
+  PLATFORM_LIGHT_INPUT_COL3,
+  PLATFORM_LIGHT_INPUT_COL4
+};
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+static void App_InitParityGpio(void);
 
 /* USER CODE END PFP */
 
@@ -116,32 +136,25 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 
+  App_InitParityGpio();
+
   SharpManager_Init(&g_sharp_manager);
   CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
-  Move_Init(&g_move);
+
+  {
+    uint32_t i;
+
+    for (i = 0; i < 4U; ++i)
+    {
+      Light_Init(g_lights[i], g_light_input_ids[i], false);
+    }
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   while (1)
   {
-    adc_mv[0] = (uint16_t)((adc_raw[0] * 3300U) / 4095U);
-    adc_mv[1] = (uint16_t)((adc_raw[1] * 3300U) / 4095U);
-    adc_mv[2] = (uint16_t)((adc_raw[2] * 3300U) / 4095U);
-    adc_mv[3] = (uint16_t)((adc_raw[3] * 3300U) / 4095U);
-    adc_mv[4] = (uint16_t)((adc_raw[4] * 3300U) / 4095U);
-
-    pwm_duty[0] = (uint16_t)((adc_raw[1] * 199U) / 4095U);
-    pwm_duty[1] = (uint16_t)((adc_raw[2] * 199U) / 4095U);
-    pwm_duty[2] = (uint16_t)((adc_raw[3] * 199U) / 4095U);
-    pwm_duty[3] = (uint16_t)((adc_raw[4] * 199U) / 4095U);
-
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, pwm_duty[0]);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, pwm_duty[1]);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, pwm_duty[2]);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, pwm_duty[3]);
-
-    HAL_Delay(10);
     /* USER CODE BEGIN 3 */
     SharpManager_Update(&g_sharp_manager);
     CloseIR_Update(&g_close_ir);
@@ -150,6 +163,8 @@ int main(void)
         &g_median_calculator,
         SharpManager_AdcToVoltage(SharpManager_GetShortRawAdc(&g_sharp_manager), 3.3, 4095.0),
         SharpManager_AdcToVoltage(SharpManager_GetLongRawAdc(&g_sharp_manager), 3.3, 4095.0));
+
+    HAL_Delay(5);
   }
   /* USER CODE END 3 */
 }
@@ -201,6 +216,29 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+static void App_InitParityGpio(void)
+{
+  GPIO_InitTypeDef gpio = {0};
+
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+  gpio.Pin = GPIO_PIN_13;
+  gpio.Mode = GPIO_MODE_OUTPUT_PP;
+  gpio.Pull = GPIO_NOPULL;
+  gpio.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &gpio);
+
+  gpio.Pin = GPIO_PIN_15;
+  gpio.Mode = GPIO_MODE_INPUT;
+  gpio.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &gpio);
+
+  gpio.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_13;
+  gpio.Mode = GPIO_MODE_INPUT;
+  gpio.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &gpio);
+}
 
 /* USER CODE END 4 */
 
