@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "MySrc/close_ir.h"
+#include "MySrc/debug_vars.h"
 #include "MySrc/light.h"
 #include "MySrc/median_calculator.h"
 #include "MySrc/move.h"
@@ -157,14 +158,29 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
+    int short_raw_adc;
+    int long_raw_adc;
+    double short_voltage;
+    double long_voltage;
+
     /* USER CODE BEGIN 3 */
     SharpManager_Update(&g_sharp_manager);
     CloseIR_Update(&g_close_ir);
 
+    short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
+    long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+    short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
+    long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+
+    g_debug_short_raw_adc = short_raw_adc;
+    g_debug_long_raw_adc = long_raw_adc;
+    g_debug_short_voltage = (float)short_voltage;
+    g_debug_long_voltage = (float)long_voltage;
+
     MedianCalculator_Update(
         &g_median_calculator,
-        SharpManager_AdcToVoltage(SharpManager_GetShortRawAdc(&g_sharp_manager), 3.3, 4095.0),
-        SharpManager_AdcToVoltage(SharpManager_GetLongRawAdc(&g_sharp_manager), 3.3, 4095.0));
+        short_voltage,
+        long_voltage);
 
     HAL_Delay(5);
   }

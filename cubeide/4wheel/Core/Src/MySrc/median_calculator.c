@@ -1,5 +1,7 @@
 #include "MySrc/median_calculator.h"
 
+#include "MySrc/debug_vars.h"
+
 #include "MySrc/defines.h"
 #include "MySrc/platform_adapter.h"
 
@@ -85,6 +87,9 @@ void MedianCalculator_Update(MedianCalculator *self, double new_short_value, dou
 
     short_median = MedianCalculator_ComputeMedian(self->samples_short, MEDIAN_CALCULATOR_SAMPLE_SIZE);
     long_median = MedianCalculator_ComputeMedian(self->samples_long, MEDIAN_CALCULATOR_SAMPLE_SIZE);
+
+    g_debug_short_median = (float)short_median;
+    g_debug_long_median = (float)long_median;
 
     Platform_DebugPrintMedians(short_median, long_median, (uint8_t)BBB_PRINT_DIGITS_AFTER_DECIMAL);
     self->current_sample_index = 0;
