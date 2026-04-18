@@ -29,6 +29,19 @@ static int Move_ScaleStrength(int strength, float coef)
     return (int)scaled;
 }
 
+void Move_Update(Move *self)
+{
+    if(self == 0)
+    {
+        return;
+    }
+
+    if(self->moveEndTime > 0 && Platform_Millis() >= self->moveEndTime)
+    {
+        Move_Walk(self, MOVE_FORWARD, 0);
+    }
+}
+
 void Move_Init(Move *self)
 {
     if (self == 0)
@@ -77,7 +90,7 @@ void Move_RotateOnSide(Move *self, bool direction, int strength)
     }
 }
 
-void Move_Walk(Move *self, bool direction, int strength)
+void Move_Walk(Move *self, bool direction, int strength, bool timed)
 {
     if (self == 0)
     {
@@ -86,6 +99,24 @@ void Move_Walk(Move *self, bool direction, int strength)
 
     Wheel_SetRotation(&self->left, direction, strength);
     Wheel_SetRotation(&self->right, direction, strength);
+
+    if(!timed)
+    {
+        self->moveEndTime = -1;
+    }
+}
+
+void Move_WalkForTime(Move *self, bool direction, int strength, int duration_millis)
+{
+    if(self == 0)
+    {
+        return;
+    }
+
+    self->moveStartTime = Platform_Millis();
+    self->moveEndTime = self->moveStartTime + duration_millis;
+
+    Move_Walk(self, direction, strength, true);
 }
 
 void Move_SlideFwd(Move *self, bool direction, int strength, float coef)

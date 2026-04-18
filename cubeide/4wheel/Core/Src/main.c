@@ -59,6 +59,7 @@ volatile uint16_t adc_raw[5] = {0};
 static SharpManager g_sharp_manager;
 static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
+static Move move;
 static Light g_fr;
 static Light g_fl;
 static Light g_br;
@@ -144,6 +145,7 @@ int main(void)
   SharpManager_Init(&g_sharp_manager);
   CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
+  Move_Init(&move);
 
   {
     uint32_t i;
@@ -154,6 +156,8 @@ int main(void)
     }
   }
   /* USER CODE END 2 */
+
+  Move_WalkForTime(&move, MOVE_FORWARD, 100, 2000);
 
   /* Infinite loop */
   while (1)
@@ -181,6 +185,8 @@ int main(void)
         &g_median_calculator,
         short_voltage,
         long_voltage);
+
+    Move_Update(&move);
 
     HAL_Delay(5);
   }
