@@ -84,6 +84,7 @@ static const uint8_t g_light_input_ids[4] =
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
 
 /* USER CODE END PFP */
@@ -125,6 +126,7 @@ int main(void)
   MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
@@ -216,6 +218,35 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+static void MX_USART1_UART_Init(void)
+{
+  GPIO_InitTypeDef gpio = {0};
+  uint32_t brr;
+
+  __HAL_RCC_USART1_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  gpio.Pin = GPIO_PIN_9;
+  gpio.Mode = GPIO_MODE_AF_PP;
+  gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &gpio);
+
+  gpio.Pin = GPIO_PIN_10;
+  gpio.Mode = GPIO_MODE_INPUT;
+  gpio.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &gpio);
+
+  USART1->CR1 = 0U;
+  USART1->CR2 = 0U;
+  USART1->CR3 = 0U;
+
+  brr = (HAL_RCC_GetPCLK2Freq() + (115200U / 2U)) / 115200U;
+  USART1->BRR = brr;
+
+  USART1->CR1 = USART_CR1_TE | USART_CR1_RE;
+  USART1->CR1 |= USART_CR1_UE;
+}
 
 static void App_InitParityGpio(void)
 {
