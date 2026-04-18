@@ -27,10 +27,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/dma.h ../Core/Inc/tim.h \
  ../Core/Inc/gpio.h ../Core/Inc/MySrc/close_ir.h \
- ../Core/Inc/MySrc/light.h ../Core/Inc/MySrc/median_calculator.h \
- ../Core/Inc/MySrc/move.h ../Core/Inc/MySrc/wheel.h \
- ../Core/Inc/MySrc/platform_adapter.h ../Core/Inc/MySrc/sharp_manager.h \
- ../Core/Inc/MySrc/sharp_suggest.h
+ ../Core/Inc/MySrc/debug_vars.h ../Core/Inc/MySrc/light.h \
+ ../Core/Inc/MySrc/median_calculator.h ../Core/Inc/MySrc/move.h \
+ ../Core/Inc/MySrc/wheel.h ../Core/Inc/MySrc/platform_adapter.h \
+ ../Core/Inc/MySrc/sharp_manager.h ../Core/Inc/MySrc/sharp_suggest.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -64,6 +64,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/tim.h:
 ../Core/Inc/gpio.h:
 ../Core/Inc/MySrc/close_ir.h:
+../Core/Inc/MySrc/debug_vars.h:
 ../Core/Inc/MySrc/light.h:
 ../Core/Inc/MySrc/median_calculator.h:
 ../Core/Inc/MySrc/move.h:
