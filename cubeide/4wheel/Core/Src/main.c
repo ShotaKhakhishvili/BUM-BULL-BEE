@@ -160,11 +160,11 @@ int main(void)
 
   Move_RotateOnPoint(&move, true, 100);
 
-  Platform_Millis(2000);
+  HAL_Delay(2000);
 
   Move_RotateOnPoint(&move, false, 100);
 
-  Platform_Millis(2000);
+  HAL_Delay(2000);
 
   Move_Walk(&move, true, 0);
 
