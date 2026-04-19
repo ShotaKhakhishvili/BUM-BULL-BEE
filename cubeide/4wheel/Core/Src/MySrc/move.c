@@ -65,7 +65,7 @@ void Move_RotateOnPoint(Move *self, bool direction, int strength)
     }
 
     Wheel_SetRotation(&self->left, direction, strength);
-    Wheel_SetRotation(&self->right, !direction, strength);
+    Wheel_SetRotation(&self->right, direction, strength);
 }
 
 void Move_RotateOnSide(Move *self, bool direction, int strength)
