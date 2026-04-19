@@ -2,9 +2,6 @@
 
 #include "MySrc/platform_adapter.h"
 
-#define MOVE_FORWARD true
-#define MOVE_BACKWARD false
-
 static int Move_ScaleStrength(int strength, float coef)
 {
     float scaled;

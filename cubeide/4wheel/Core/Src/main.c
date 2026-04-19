@@ -155,9 +155,10 @@ int main(void)
       Light_Init(g_lights[i], g_light_input_ids[i], false);
     }
   }
-  /* USER CODE END 2 */
-
+  
   Move_WalkForTime(&move, MOVE_FORWARD, 100, 2000);
+
+  /* USER CODE END 2 */
 
   /* Infinite loop */
   while (1)

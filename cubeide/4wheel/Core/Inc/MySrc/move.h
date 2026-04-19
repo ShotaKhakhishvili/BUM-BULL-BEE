@@ -1,6 +1,9 @@
 #ifndef MYSRC_MOVE_H
 #define MYSRC_MOVE_H
 
+#define MOVE_FORWARD true
+#define MOVE_BACKWARD false
+
 #include <stdbool.h>
 
 #include "MySrc/wheel.h"
