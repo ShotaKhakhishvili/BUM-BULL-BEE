@@ -156,7 +156,7 @@ int main(void)
     }
   }
   
-  Move_WalkForTime(&move, MOVE_FORWARD, 100, 2000);
+  Move_WalkForTime(&move, MOVE_FORWARD, 200, 2000);
 
   /* USER CODE END 2 */
 
