@@ -156,18 +156,25 @@ int main(void)
     }
   }
   
-  //Move_WalkForTime(&move, MOVE_FORWARD, 200, 2000);
+  Move_Walk(&move, MOVE_FORWARD, 100);
 
-  Move_RotateOnPoint(&move, true, 100);
+  HAL_Delay(3000);
 
-  HAL_Delay(2000);
+  Move_Walk(&move, MOVE_FORWARD, 200);
 
-  Move_RotateOnPoint(&move, false, 100);
+  HAL_Delay(3000);
 
-  HAL_Delay(2000);
+  /* 
+    Move_RotateOnPoint(&move, ROT_RIGHT, 100);
 
-  Move_Walk(&move, true, 0);
+    HAL_Delay(2000);
 
+    Move_RotateOnPoint(&move, ROT_LEFT, 100);
+
+    HAL_Delay(2000);
+
+    Move_Walk(&move, true, 0);
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -3,6 +3,8 @@
 
 #define MOVE_FORWARD true
 #define MOVE_BACKWARD false
+#define ROT_RIGHT true
+#define ROT_LEFT false
 
 #include <stdbool.h>
 
