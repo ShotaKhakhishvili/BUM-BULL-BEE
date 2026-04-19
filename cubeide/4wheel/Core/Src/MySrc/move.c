@@ -78,12 +78,12 @@ void Move_RotateOnSide(Move *self, bool direction, int strength)
     if (direction)
     {
         Wheel_SetRotation(&self->left, MOVE_BACKWARD, strength);
-        Wheel_SetRotation(&self->right, MOVE_FORWARD, 0);
+        Wheel_SetRotation(&self->right, MOVE_BACKWARD, 0);
     }
     else
     {
         Wheel_SetRotation(&self->left, MOVE_FORWARD, 0);
-        Wheel_SetRotation(&self->right, MOVE_BACKWARD, strength);
+        Wheel_SetRotation(&self->right, MOVE_FORWARD, strength);
     }
 }
 
