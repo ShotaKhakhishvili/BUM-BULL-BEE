@@ -97,7 +97,7 @@ void Move_Walk(Move *self, bool direction, int strength)
     Wheel_SetRotation(&self->left, direction, strength);
     Wheel_SetRotation(&self->right, !direction, strength);
 
-    self->moveEndTime = -1;
+    self->moveEndTime = 0;
 }
 
 void Move_WalkForTime(Move *self, bool direction, int strength, int duration_millis)
