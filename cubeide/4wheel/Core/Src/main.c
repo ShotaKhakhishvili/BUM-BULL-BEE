@@ -182,8 +182,12 @@ int main(void)
   {
     int short_raw_adc;
     int long_raw_adc;
+    int left_raw_adc;
+    int right_raw_adc;
     double short_voltage;
     double long_voltage;
+    double left_voltage;
+    double right_voltage;
 
     /* USER CODE BEGIN 3 */
     SharpManager_Update(&g_sharp_manager);
@@ -191,13 +195,21 @@ int main(void)
 
     short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
     long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+    left_raw_adc = SharpManager_GetLeftRawAdc(&g_sharp_manager);
+    right_raw_adc = SharpManager_GetRightRawAdc(&g_sharp_manager);
     short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
     long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+    left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
+    right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
 
     g_debug_short_raw_adc = short_raw_adc;
     g_debug_long_raw_adc = long_raw_adc;
+    g_debug_left_raw_adc = left_raw_adc;
+    g_debug_right_raw_adc = right_raw_adc;
     g_debug_short_voltage = (float)short_voltage;
     g_debug_long_voltage = (float)long_voltage;
+    g_debug_left_voltage = (float)left_voltage;
+    g_debug_right_voltage = (float)right_voltage;
 
     MedianCalculator_Update(
         &g_median_calculator,

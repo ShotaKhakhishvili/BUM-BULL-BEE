@@ -31,6 +31,8 @@
 uint32_t Platform_Millis(void);
 uint16_t Platform_ReadIrSmlAdc(void);
 uint16_t Platform_ReadIrMAdc(void);
+uint16_t Platform_ReadIrRAdc(void);
+uint16_t Platform_ReadIrLAdc(void);
 uint16_t Platform_ReadIrCloseAdc(void);
 
 void Platform_DebugPrintMedians(double short_median, double long_median, uint8_t digits_after_decimal);

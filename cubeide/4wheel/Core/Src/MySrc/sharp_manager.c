@@ -77,6 +77,42 @@ static void SharpManager_UpdateShortSensor(SharpManager *self, uint32_t now)
     }
 }
 
+static void SharpManager_UpdateLeftSensor(SharpManager *self, uint32_t now)
+{
+    if ((now - self->last_left_read) >= SHARP_DELAY_LONG_MS)
+    {
+        self->raw_left_adc = (int)Platform_ReadIrLAdc();
+
+        {
+            double new_distance = SharpManager_ConvertLongVoltageToDistance(
+                SharpManager_AdcToVoltage(self->raw_left_adc, 3.3, 4095.0));
+            self->distance_left_cm =
+                (self->distance_left_cm * (1.0 - SHARP_ALPHA_LONG)) +
+                (new_distance * SHARP_ALPHA_LONG);
+        }
+
+        self->last_left_read = now;
+    }
+}
+
+static void SharpManager_UpdateRightSensor(SharpManager *self, uint32_t now)
+{
+    if ((now - self->last_right_read) >= SHARP_DELAY_LONG_MS)
+    {
+        self->raw_right_adc = (int)Platform_ReadIrRAdc();
+
+        {
+            double new_distance = SharpManager_ConvertLongVoltageToDistance(
+                SharpManager_AdcToVoltage(self->raw_right_adc, 3.3, 4095.0));
+            self->distance_right_cm =
+                (self->distance_right_cm * (1.0 - SHARP_ALPHA_LONG)) +
+                (new_distance * SHARP_ALPHA_LONG);
+        }
+
+        self->last_right_read = now;
+    }
+}
+
 void SharpManager_Init(SharpManager *self)
 {
     uint32_t now;
@@ -90,12 +126,20 @@ void SharpManager_Init(SharpManager *self)
 
     self->last_short_read = now - SHARP_DELAY_SHORT_MS - 1U;
     self->last_long_read = now - SHARP_DELAY_LONG_MS - 1U;
+    self->last_left_read = now - SHARP_DELAY_LONG_MS - 1U;
+    self->last_right_read = now - SHARP_DELAY_LONG_MS - 1U;
 
     self->raw_long_adc = (int)Platform_ReadIrMAdc();
     self->raw_short_adc = (int)Platform_ReadIrSmlAdc();
+    self->raw_left_adc = (int)Platform_ReadIrLAdc();
+    self->raw_right_adc = (int)Platform_ReadIrRAdc();
 
     self->distance_long_cm = SharpManager_GetRawLongDistance(self);
     self->distance_short_cm = SharpManager_GetRawShortDistance(self);
+    self->distance_left_cm = SharpManager_ConvertLongVoltageToDistance(
+        SharpManager_AdcToVoltage(self->raw_left_adc, 3.3, 4095.0));
+    self->distance_right_cm = SharpManager_ConvertLongVoltageToDistance(
+        SharpManager_AdcToVoltage(self->raw_right_adc, 3.3, 4095.0));
 
     self->current_mode = SHARP_MODE_LONG;
     SharpManager_RefreshSelectedDistance(self);
@@ -116,6 +160,8 @@ void SharpManager_Update(SharpManager *self)
 
     SharpManager_UpdateLongSensor(self, now);
     SharpManager_UpdateShortSensor(self, now);
+    SharpManager_UpdateLeftSensor(self, now);
+    SharpManager_UpdateRightSensor(self, now);
 
     SharpSuggest_Update(&self->suggest, self->raw_long_adc, self->raw_short_adc);
 
@@ -158,6 +204,16 @@ double SharpManager_GetShortDistance(const SharpManager *self)
     return (self == 0) ? 0.0 : self->distance_short_cm;
 }
 
+double SharpManager_GetLeftDistance(const SharpManager *self)
+{
+    return (self == 0) ? 0.0 : self->distance_left_cm;
+}
+
+double SharpManager_GetRightDistance(const SharpManager *self)
+{
+    return (self == 0) ? 0.0 : self->distance_right_cm;
+}
+
 double SharpManager_GetRawLongDistance(const SharpManager *self)
 {
     if (self == 0)
@@ -188,6 +244,16 @@ int SharpManager_GetLongRawAdc(const SharpManager *self)
 int SharpManager_GetShortRawAdc(const SharpManager *self)
 {
     return (self == 0) ? 0 : self->raw_short_adc;
+}
+
+int SharpManager_GetLeftRawAdc(const SharpManager *self)
+{
+    return (self == 0) ? 0 : self->raw_left_adc;
+}
+
+int SharpManager_GetRightRawAdc(const SharpManager *self)
+{
+    return (self == 0) ? 0 : self->raw_right_adc;
 }
 
 SharpMode SharpManager_GetMode(const SharpManager *self)

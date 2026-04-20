@@ -134,6 +134,16 @@ uint16_t Platform_ReadIrMAdc(void)
     return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_M);
 }
 
+uint16_t Platform_ReadIrRAdc(void)
+{
+    return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_R);
+}
+
+uint16_t Platform_ReadIrLAdc(void)
+{
+    return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_L);
+}
+
 uint16_t Platform_ReadIrCloseAdc(void)
 {
     return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_CLOSE_A);

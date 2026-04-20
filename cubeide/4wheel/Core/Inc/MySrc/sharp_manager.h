@@ -15,12 +15,18 @@ typedef struct
 {
     uint32_t last_short_read;
     uint32_t last_long_read;
+    uint32_t last_left_read;
+    uint32_t last_right_read;
 
     int raw_long_adc;
     int raw_short_adc;
+    int raw_left_adc;
+    int raw_right_adc;
 
     double distance_long_cm;
     double distance_short_cm;
+    double distance_left_cm;
+    double distance_right_cm;
     double selected_distance_cm;
 
     SharpMode current_mode;
@@ -33,12 +39,16 @@ void SharpManager_Update(SharpManager *self);
 double SharpManager_GetSelectedDistance(const SharpManager *self);
 double SharpManager_GetLongDistance(const SharpManager *self);
 double SharpManager_GetShortDistance(const SharpManager *self);
+double SharpManager_GetLeftDistance(const SharpManager *self);
+double SharpManager_GetRightDistance(const SharpManager *self);
 
 double SharpManager_GetRawLongDistance(const SharpManager *self);
 double SharpManager_GetRawShortDistance(const SharpManager *self);
 
 int SharpManager_GetLongRawAdc(const SharpManager *self);
 int SharpManager_GetShortRawAdc(const SharpManager *self);
+int SharpManager_GetLeftRawAdc(const SharpManager *self);
+int SharpManager_GetRightRawAdc(const SharpManager *self);
 
 SharpMode SharpManager_GetMode(const SharpManager *self);
 
