@@ -17,11 +17,11 @@
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_R
-#define PLATFORM_ADC_IDX_IR_R 3U /* PA6 / ADC1_IN6 */
+#define PLATFORM_ADC_IDX_IR_R 4U /* PA7 / ADC1_IN7 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_L
-#define PLATFORM_ADC_IDX_IR_L 4U /* PA7 / ADC1_IN7 */
+#define PLATFORM_ADC_IDX_IR_L 3U /* PA6 / ADC1_IN6 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_CLOSE_A
