@@ -36,7 +36,7 @@ typedef struct
 void SharpManager_Init(SharpManager *self);
 void SharpManager_Update(SharpManager *self);
 
-double SharpManager_GetSelectedDistance(const SharpManager *self);
+double SharpManager_GetMiddleDistance(const SharpManager *self);
 double SharpManager_GetLongDistance(const SharpManager *self);
 double SharpManager_GetShortDistance(const SharpManager *self);
 double SharpManager_GetLeftDistance(const SharpManager *self);

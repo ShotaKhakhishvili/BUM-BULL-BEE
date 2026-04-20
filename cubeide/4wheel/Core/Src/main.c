@@ -32,6 +32,7 @@
 #include "MySrc/median_calculator.h"
 #include "MySrc/move.h"
 #include "MySrc/platform_adapter.h"
+#include "MySrc/seek.h"
 #include "MySrc/sharp_manager.h"
 
 /* USER CODE END Includes */
@@ -60,10 +61,15 @@ static SharpManager g_sharp_manager;
 static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
 static Move move;
+static Seek g_seek;
 static Light g_fr;
 static Light g_fl;
 static Light g_br;
 static Light g_bl;
+
+/* Fast seek tuning template: update values here for quick strategy iteration. */
+static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
+static volatile SeekMode g_seek_mode = SEEK_MODE_CHASE;
 
 static Light *g_lights[4] =
 {
@@ -146,6 +152,8 @@ int main(void)
   CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
   Move_Init(&move);
+  Seek_Init(&g_seek);
+  Seek_SetTuning(&g_seek, &g_seek_tuning);
 
   {
     uint32_t i;
@@ -164,6 +172,7 @@ int main(void)
 
   HAL_Delay(3000);
 
+  Move_Walk(&move, MOVE_FORWARD, 0);
   /* 
     Move_RotateOnPoint(&move, ROT_RIGHT, 100);
 
@@ -215,6 +224,8 @@ int main(void)
         &g_median_calculator,
         short_voltage,
         long_voltage);
+
+    Seek_Update(&g_seek, g_seek_mode, &move, &g_sharp_manager);
 
     Move_Update(&move);
 

@@ -189,7 +189,7 @@ void SharpManager_Update(SharpManager *self)
     SharpManager_RefreshSelectedDistance(self);
 }
 
-double SharpManager_GetSelectedDistance(const SharpManager *self)
+double SharpManager_GetMiddleDistance(const SharpManager *self)
 {
     return (self == 0) ? 0.0 : self->selected_distance_cm;
 }
