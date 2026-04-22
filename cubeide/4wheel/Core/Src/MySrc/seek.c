@@ -1,5 +1,16 @@
 #include "MySrc/seek.h"
 
+#define SEEK_MIN_LOOK_ROTATE_SPEED 110
+#define SEEK_LOST_TARGET_ROTATE_BOOST 20
+#define SEEK_MIN_STEER_DELTA 85
+#define SEEK_AGGRESSIVE_TURN_COEF_THRESHOLD 0.20f
+#define SEEK_AGGRESSIVE_INNER_REVERSE_COEF 0.55f
+
+static int Seek_MaxInt(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
 static int Seek_ClampSpeed(int speed)
 {
     if (speed < 0)
@@ -80,9 +91,29 @@ static void Seek_Stop(Move *move)
     Move_Walk(move, MOVE_FORWARD, 0);
 }
 
-static void Seek_LookRight(const Seek *self, Move *move)
+static void Seek_Look(
+    const Seek *self,
+    Move *move,
+    SeekSteerDirection direction,
+    int rotate_speed)
 {
-    Move_RotateOnPoint(move, ROT_RIGHT, Seek_ClampSpeed(self->tuning.look_rotate_speed));
+    bool rotate_direction;
+
+    rotate_speed = Seek_ClampSpeed(rotate_speed);
+
+    if (rotate_speed < SEEK_MIN_LOOK_ROTATE_SPEED)
+    {
+        rotate_speed = SEEK_MIN_LOOK_ROTATE_SPEED;
+    }
+
+    rotate_direction = ROT_RIGHT;
+
+    if (direction == SEEK_STEER_LEFT)
+    {
+        rotate_direction = ROT_LEFT;
+    }
+
+    Move_RotateOnPoint(move, rotate_direction, rotate_speed);
 }
 
 static void Seek_MoveForward(Move *move, int speed)
@@ -96,22 +127,61 @@ static void Seek_MoveWithSteer(
     SeekSteerDirection direction,
     float coef)
 {
+    bool aggressive_turn;
     int left_speed;
     int right_speed;
+    int min_inner_speed;
 
     speed = Seek_ClampSpeed(speed);
     coef = Seek_ClampCoef(coef);
+    aggressive_turn = (coef <= SEEK_AGGRESSIVE_TURN_COEF_THRESHOLD);
 
     left_speed = speed;
     right_speed = speed;
+    min_inner_speed = speed - SEEK_MIN_STEER_DELTA;
+
+    if (min_inner_speed < 0)
+    {
+        min_inner_speed = 0;
+    }
 
     if (direction == SEEK_STEER_LEFT)
     {
+        if (aggressive_turn)
+        {
+            left_speed = Seek_ScaleSpeedByCoef(speed, SEEK_AGGRESSIVE_INNER_REVERSE_COEF);
+
+            Wheel_SetRotation(&move->left, MOVE_BACKWARD, left_speed);
+            Wheel_SetRotation(&move->right, MOVE_BACKWARD, right_speed);
+            move->moveEndTime = 0U;
+            return;
+        }
+
         left_speed = Seek_ScaleSpeedByCoef(speed, coef);
+
+        if (left_speed > min_inner_speed)
+        {
+            left_speed = min_inner_speed;
+        }
     }
     else if (direction == SEEK_STEER_RIGHT)
     {
+        if (aggressive_turn)
+        {
+            right_speed = Seek_ScaleSpeedByCoef(speed, SEEK_AGGRESSIVE_INNER_REVERSE_COEF);
+
+            Wheel_SetRotation(&move->left, MOVE_FORWARD, left_speed);
+            Wheel_SetRotation(&move->right, MOVE_FORWARD, right_speed);
+            move->moveEndTime = 0U;
+            return;
+        }
+
         right_speed = Seek_ScaleSpeedByCoef(speed, coef);
+
+        if (right_speed > min_inner_speed)
+        {
+            right_speed = min_inner_speed;
+        }
     }
 
     /* Keep forward motion consistent with Move_Walk wiring convention. */
@@ -130,6 +200,21 @@ static int Seek_GetBaseSpeed(const Seek *self, SeekMode mode)
     return self->tuning.chase_speed;
 }
 
+static void Seek_UpdateDirectionMemory(Seek *self, SeekSteerDirection direction)
+{
+    if (self == 0)
+    {
+        return;
+    }
+
+    self->last_steer_direction = direction;
+
+    if ((direction == SEEK_STEER_LEFT) || (direction == SEEK_STEER_RIGHT))
+    {
+        self->last_turn_direction = direction;
+    }
+}
+
 void Seek_Init(Seek *self)
 {
     if (self == 0)
@@ -139,6 +224,7 @@ void Seek_Init(Seek *self)
 
     self->tuning = (SeekTuning)SEEK_TUNING_DEFAULT_INITIALIZER;
     self->last_steer_direction = SEEK_STEER_STRAIGHT;
+    self->last_turn_direction = SEEK_STEER_RIGHT;
     self->target_visible = false;
 }
 
@@ -185,21 +271,28 @@ void Seek_Update(
     if (mode == SEEK_MODE_NONE)
     {
         Seek_Stop(move);
-        self->last_steer_direction = SEEK_STEER_STRAIGHT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_STRAIGHT);
         return;
     }
 
     if (mode == SEEK_MODE_LOOK)
     {
-        Seek_LookRight(self, move);
-        self->last_steer_direction = SEEK_STEER_RIGHT;
+        direction = self->last_steer_direction;
+
+        if (direction == SEEK_STEER_STRAIGHT)
+        {
+            direction = self->last_turn_direction;
+        }
+
+        Seek_Look(self, move, direction, self->tuning.look_rotate_speed);
+        Seek_UpdateDirectionMemory(self, direction);
         return;
     }
 
     if ((mode != SEEK_MODE_CHASE) && (mode != SEEK_MODE_CATCH))
     {
         Seek_Stop(move);
-        self->last_steer_direction = SEEK_STEER_STRAIGHT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_STRAIGHT);
         return;
     }
 
@@ -207,15 +300,28 @@ void Seek_Update(
 
     if (!self->target_visible)
     {
-        Seek_LookRight(self, move);
-        self->last_steer_direction = SEEK_STEER_RIGHT;
+        int recovery_rotate_speed;
+
+        direction = self->last_steer_direction;
+
+        if (direction == SEEK_STEER_STRAIGHT)
+        {
+            direction = self->last_turn_direction;
+        }
+
+        recovery_rotate_speed = Seek_MaxInt(
+            self->tuning.look_rotate_speed,
+            base_speed + SEEK_LOST_TARGET_ROTATE_BOOST);
+
+        Seek_Look(self, move, direction, recovery_rotate_speed);
+        Seek_UpdateDirectionMemory(self, direction);
         return;
     }
 
     if (sees_middle && !sees_left && !sees_right)
     {
         Seek_MoveForward(move, base_speed);
-        self->last_steer_direction = SEEK_STEER_STRAIGHT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_STRAIGHT);
         return;
     }
 
@@ -223,35 +329,35 @@ void Seek_Update(
     {
         direction = Seek_BalanceDirection(left_cm, right_cm, self->tuning.balance_tolerance_cm);
         Seek_MoveWithSteer(move, base_speed, direction, self->tuning.small_turn_coef);
-        self->last_steer_direction = direction;
+        Seek_UpdateDirectionMemory(self, direction);
         return;
     }
 
     if (sees_middle && sees_left && !sees_right)
     {
         Seek_MoveWithSteer(move, base_speed, SEEK_STEER_LEFT, self->tuning.medium_turn_coef);
-        self->last_steer_direction = SEEK_STEER_LEFT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_LEFT);
         return;
     }
 
     if (sees_middle && !sees_left && sees_right)
     {
         Seek_MoveWithSteer(move, base_speed, SEEK_STEER_RIGHT, self->tuning.medium_turn_coef);
-        self->last_steer_direction = SEEK_STEER_RIGHT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_RIGHT);
         return;
     }
 
     if (!sees_middle && sees_left && !sees_right)
     {
         Seek_MoveWithSteer(move, base_speed, SEEK_STEER_LEFT, self->tuning.high_turn_coef);
-        self->last_steer_direction = SEEK_STEER_LEFT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_LEFT);
         return;
     }
 
     if (!sees_middle && !sees_left && sees_right)
     {
         Seek_MoveWithSteer(move, base_speed, SEEK_STEER_RIGHT, self->tuning.high_turn_coef);
-        self->last_steer_direction = SEEK_STEER_RIGHT;
+        Seek_UpdateDirectionMemory(self, SEEK_STEER_RIGHT);
         return;
     }
 
@@ -259,12 +365,12 @@ void Seek_Update(
     {
         direction = Seek_BalanceDirection(left_cm, right_cm, self->tuning.balance_tolerance_cm);
         Seek_MoveWithSteer(move, base_speed, direction, self->tuning.small_turn_coef);
-        self->last_steer_direction = direction;
+        Seek_UpdateDirectionMemory(self, direction);
         return;
     }
 
     Seek_MoveForward(move, base_speed);
-    self->last_steer_direction = SEEK_STEER_STRAIGHT;
+    Seek_UpdateDirectionMemory(self, SEEK_STEER_STRAIGHT);
 }
 
 SeekTuning Seek_GetTuning(const Seek *self)

@@ -39,7 +39,7 @@ typedef struct
     {                                   \
         65.0,                           \
         1.0,                            \
-        50,                             \
+        120,                            \
         100,                            \
         150,                            \
         0.60f,                          \
@@ -51,6 +51,7 @@ typedef struct
 {
     SeekTuning tuning;
     SeekSteerDirection last_steer_direction;
+    SeekSteerDirection last_turn_direction;
     bool target_visible;
 } Seek;
 
