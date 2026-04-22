@@ -163,16 +163,7 @@ int main(void)
       Light_Init(g_lights[i], g_light_input_ids[i], false);
     }
   }
-  
-  Move_Walk(&move, MOVE_FORWARD, 100);
 
-  HAL_Delay(3000);
-
-  Move_Walk(&move, MOVE_FORWARD, 200);
-
-  HAL_Delay(3000);
-
-  Move_Walk(&move, MOVE_FORWARD, 0);
   /* 
     Move_RotateOnPoint(&move, ROT_RIGHT, 100);
 
@@ -184,6 +175,7 @@ int main(void)
 
     Move_Walk(&move, true, 0);
   */
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
