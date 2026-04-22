@@ -69,7 +69,7 @@ static Light g_bl;
 
 /* Fast seek tuning template: update values here for quick strategy iteration. */
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
-static volatile SeekMode g_seek_mode = SEEK_MODE_CHASE;
+static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
 static Light *g_lights[4] =
 {
@@ -218,6 +218,15 @@ int main(void)
         long_voltage);
 
     Seek_Update(&g_seek, g_seek_mode, &move, &g_sharp_manager);
+
+    if ((g_seek_mode == SEEK_MODE_LOOK) && Seek_IsTargetVisible(&g_seek))
+    {
+      g_seek_mode = SEEK_MODE_CHASE;
+    }
+    else if ((g_seek_mode == SEEK_MODE_CHASE) && !Seek_IsTargetVisible(&g_seek))
+    {
+      g_seek_mode = SEEK_MODE_LOOK;
+    }
 
     Move_Update(&move);
 

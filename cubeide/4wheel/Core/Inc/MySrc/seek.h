@@ -42,9 +42,9 @@ typedef struct
         50,                             \
         100,                            \
         150,                            \
-        0.85f,                          \
-        0.65f,                          \
-        0.45f                           \
+        0.60f,                          \
+        0.35f,                          \
+        0.10f                           \
     }
 
 typedef struct
