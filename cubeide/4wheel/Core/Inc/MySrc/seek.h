@@ -29,10 +29,6 @@ typedef struct
     int look_rotate_speed;
     int chase_speed;
     int catch_speed;
-
-    float small_turn_coef;
-    float medium_turn_coef;
-    float high_turn_coef;
 } SeekTuning;
 
 #define SEEK_TUNING_DEFAULT_INITIALIZER \
@@ -42,9 +38,6 @@ typedef struct
         120,                            \
         100,                            \
         150,                            \
-        0.60f,                          \
-        0.35f,                          \
-        0.10f                           \
     }
 
 typedef struct

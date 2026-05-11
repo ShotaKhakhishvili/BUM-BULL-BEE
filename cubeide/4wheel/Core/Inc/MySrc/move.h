@@ -27,5 +27,6 @@ void Move_Walk(Move *self, bool direction, int strength);
 void Move_WalkForTime(Move *self, bool direction, int strength, int duration_millis);
 void Move_SlideFwd(Move *self, bool direction, int strength, float coef);
 void Move_SlideBwd(Move *self, bool direction, int strength, float coef);
+void Move_Stop(Move *self);
 
 #endif /* MYSRC_MOVE_H */

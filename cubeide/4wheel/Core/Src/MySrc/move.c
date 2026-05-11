@@ -66,6 +66,7 @@ void Move_RotateOnPoint(Move *self, bool direction, int strength)
 
     Wheel_SetRotation(&self->left, direction, strength);
     Wheel_SetRotation(&self->right, direction, strength);
+    self->moveEndTime = 0U;
 }
 
 void Move_RotateOnSide(Move *self, bool direction, int strength)
@@ -85,6 +86,7 @@ void Move_RotateOnSide(Move *self, bool direction, int strength)
         Wheel_SetRotation(&self->left, MOVE_FORWARD, 0);
         Wheel_SetRotation(&self->right, MOVE_FORWARD, strength);
     }
+    self->moveEndTime = 0U;
 }
 
 void Move_Walk(Move *self, bool direction, int strength)
@@ -97,7 +99,7 @@ void Move_Walk(Move *self, bool direction, int strength)
     Wheel_SetRotation(&self->left, direction, strength);
     Wheel_SetRotation(&self->right, !direction, strength);
 
-    self->moveEndTime = 0;
+    self->moveEndTime = 0U;
 }
 
 void Move_WalkForTime(Move *self, bool direction, int strength, int duration_millis)
@@ -120,7 +122,7 @@ void Move_SlideFwd(Move *self, bool direction, int strength, float coef)
         return;
     }
 
-    if (!direction)
+    if (direction)
     {
         Wheel_SetRotation(&self->left, MOVE_FORWARD, strength);
         Wheel_SetRotation(&self->right, MOVE_FORWARD, Move_ScaleStrength(strength, coef));
@@ -130,6 +132,7 @@ void Move_SlideFwd(Move *self, bool direction, int strength, float coef)
         Wheel_SetRotation(&self->left, MOVE_FORWARD, Move_ScaleStrength(strength, coef));
         Wheel_SetRotation(&self->right, MOVE_FORWARD, strength);
     }
+    self->moveEndTime = 0U;
 }
 
 void Move_SlideBwd(Move *self, bool direction, int strength, float coef)
@@ -139,7 +142,7 @@ void Move_SlideBwd(Move *self, bool direction, int strength, float coef)
         return;
     }
 
-    if (direction)
+    if (!direction)
     {
         Wheel_SetRotation(&self->left, MOVE_BACKWARD, strength);
         Wheel_SetRotation(&self->right, MOVE_BACKWARD, Move_ScaleStrength(strength, coef));
@@ -149,4 +152,10 @@ void Move_SlideBwd(Move *self, bool direction, int strength, float coef)
         Wheel_SetRotation(&self->left, MOVE_BACKWARD, Move_ScaleStrength(strength, coef));
         Wheel_SetRotation(&self->right, MOVE_BACKWARD, strength);
     }
+    self->moveEndTime = 0U;
+}
+
+void Move_Stop(Move *self)
+{
+    Move_Walk(self, MOVE_FORWARD, 0);
 }
