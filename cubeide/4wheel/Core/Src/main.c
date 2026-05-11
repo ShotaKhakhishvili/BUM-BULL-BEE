@@ -217,6 +217,7 @@ int main(void)
         short_voltage,
         long_voltage);
 
+    /*
     Seek_Update(&g_seek, g_seek_mode, &move, &g_sharp_manager);
 
     if ((g_seek_mode == SEEK_MODE_LOOK) && Seek_IsTargetVisible(&g_seek))
@@ -227,6 +228,9 @@ int main(void)
     {
       g_seek_mode = SEEK_MODE_LOOK;
     }
+    */
+
+    Move_SlideFwd(&move, ROT_RIGHT, 100, 0.5);
 
     Move_Update(&move);
 
