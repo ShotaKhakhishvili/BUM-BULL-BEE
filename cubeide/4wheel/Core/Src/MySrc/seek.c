@@ -55,8 +55,11 @@ static int Seek_ScaleSpeedByCoef(int speed, float coef)
     return (int)scaled;
 }
 
-static bool Seek_IsSeen(double distance_cm, double threshold_cm)
+static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
 {
+	if(volt <= 0.216)
+		return false;
+
     return (distance_cm > 0.0) && (distance_cm <= threshold_cm);
 }
 
@@ -175,9 +178,9 @@ static float Seek_CalcualteRotationCoefficient(
         return 1.0f;
     }
     if(!sees_middle)
-        return 0.5f;
+        return 0.1f;
 
-    return 0.75f;
+    return 0.2f;
 }
 
 void Seek_Init(Seek *self)
@@ -220,6 +223,13 @@ void Seek_Update(
     float rotCoef;
     SeekSteerDirection direction;
 
+    int long_raw_adc;
+    int left_raw_adc;
+    int right_raw_adc;
+    double long_voltage;
+    double left_voltage;
+    double right_voltage;
+
     if ((self == 0) || (move == 0) || (sharp_manager == 0))
     {
         return;
@@ -229,9 +239,17 @@ void Seek_Update(
     left_cm = SharpManager_GetLeftDistance(sharp_manager);
     right_cm = SharpManager_GetRightDistance(sharp_manager);
 
-    sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm);
-    sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm);
-    sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm);
+    long_raw_adc = SharpManager_GetLongRawAdc(sharp_manager);
+    left_raw_adc = SharpManager_GetLeftRawAdc(sharp_manager);
+    right_raw_adc = SharpManager_GetRightRawAdc(sharp_manager);
+
+    long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+    left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
+    right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
+
+    sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm, long_voltage);
+    sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm, left_voltage);
+    sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm, right_voltage);
 
     self->target_visible = sees_middle || sees_left || sees_right;
 

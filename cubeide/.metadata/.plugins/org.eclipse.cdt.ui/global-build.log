@@ -1,4 +1,12 @@
-21:28:59 **** Incremental Build of configuration Debug for project 4wheel ****
+14:57:15 **** Clean-only build of configuration Debug for project 4wheel ****
+make -j16 clean 
+rm -rf ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.su ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.cyclo ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.o ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.su
+rm -rf ./Core/Startup/startup_stm32f103c8tx.d ./Core/Startup/startup_stm32f103c8tx.o
+rm -rf ./Core/Src/MySrc/close_ir.cyclo ./Core/Src/MySrc/close_ir.d ./Core/Src/MySrc/close_ir.o ./Core/Src/MySrc/close_ir.su ./Core/Src/MySrc/debug_vars.cyclo ./Core/Src/MySrc/debug_vars.d ./Core/Src/MySrc/debug_vars.o ./Core/Src/MySrc/debug_vars.su ./Core/Src/MySrc/light.cyclo ./Core/Src/MySrc/light.d ./Core/Src/MySrc/light.o ./Core/Src/MySrc/light.su ./Core/Src/MySrc/median_calculator.cyclo ./Core/Src/MySrc/median_calculator.d ./Core/Src/MySrc/median_calculator.o ./Core/Src/MySrc/median_calculator.su ./Core/Src/MySrc/move.cyclo ./Core/Src/MySrc/move.d ./Core/Src/MySrc/move.o ./Core/Src/MySrc/move.su ./Core/Src/MySrc/platform_adapter.cyclo ./Core/Src/MySrc/platform_adapter.d ./Core/Src/MySrc/platform_adapter.o ./Core/Src/MySrc/platform_adapter.su ./Core/Src/MySrc/seek.cyclo ./Core/Src/MySrc/seek.d ./Core/Src/MySrc/seek.o ./Core/Src/MySrc/seek.su ./Core/Src/MySrc/sharp_manager.cyclo ./Core/Src/MySrc/sharp_manager.d ./Core/Src/MySrc/sharp_manager.o ./Core/Src/MySrc/sharp_manager.su ./Core/Src/MySrc/sharp_suggest.cyclo ./Core/Src/MySrc/sharp_suggest.d ./Core/Src/MySrc/sharp_suggest.o ./Core/Src/MySrc/sharp_suggest.su ./Core/Src/MySrc/sharp_volt_to_distance.cyclo ./Core/Src/MySrc/sharp_volt_to_distance.d ./Core/Src/MySrc/sharp_volt_to_distance.o ./Core/Src/MySrc/sharp_volt_to_distance.su ./Core/Src/MySrc/wheel.cyclo ./Core/Src/MySrc/wheel.d ./Core/Src/MySrc/wheel.o ./Core/Src/MySrc/wheel.su
+rm -rf ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/dma.cyclo ./Core/Src/dma.d ./Core/Src/dma.o ./Core/Src/dma.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/stm32f1xx_hal_msp.cyclo ./Core/Src/stm32f1xx_hal_msp.d ./Core/Src/stm32f1xx_hal_msp.o ./Core/Src/stm32f1xx_hal_msp.su ./Core/Src/stm32f1xx_it.cyclo ./Core/Src/stm32f1xx_it.d ./Core/Src/stm32f1xx_it.o ./Core/Src/stm32f1xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f1xx.cyclo ./Core/Src/system_stm32f1xx.d ./Core/Src/system_stm32f1xx.o ./Core/Src/system_stm32f1xx.su ./Core/Src/tim.cyclo ./Core/Src/tim.d ./Core/Src/tim.o ./Core/Src/tim.su
+rm -rf 4wheel.elf 4wheel.list 4wheel.map default.size.stdout
+ 
+14:57:16 **** Build of configuration Debug for project 4wheel ****
 make -j16 all 
 arm-none-eabi-gcc "../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.d" -MT"Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o"
 arm-none-eabi-gcc "../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.d" -MT"Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.o"
@@ -22,12 +30,16 @@ arm-none-eabi-gcc "../Core/Src/MySrc/light.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DD
 arm-none-eabi-gcc "../Core/Src/MySrc/median_calculator.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/median_calculator.d" -MT"Core/Src/MySrc/median_calculator.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/median_calculator.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/move.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/move.d" -MT"Core/Src/MySrc/move.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/move.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/platform_adapter.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/platform_adapter.d" -MT"Core/Src/MySrc/platform_adapter.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/platform_adapter.o"
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/sharp_manager.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/sharp_manager.d" -MT"Core/Src/MySrc/sharp_manager.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/sharp_manager.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/sharp_suggest.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/sharp_suggest.d" -MT"Core/Src/MySrc/sharp_suggest.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/sharp_suggest.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/sharp_volt_to_distance.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/sharp_volt_to_distance.d" -MT"Core/Src/MySrc/sharp_volt_to_distance.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/sharp_volt_to_distance.o"
 arm-none-eabi-gcc "../Core/Src/MySrc/wheel.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/wheel.d" -MT"Core/Src/MySrc/wheel.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/wheel.o"
 arm-none-eabi-gcc "../Core/Src/adc.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/adc.d" -MT"Core/Src/adc.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/adc.o"
 arm-none-eabi-gcc "../Core/Src/dma.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/dma.d" -MT"Core/Src/dma.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/dma.o"
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
 arm-none-eabi-gcc "../Core/Src/gpio.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/gpio.d" -MT"Core/Src/gpio.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/gpio.o"
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc "../Core/Src/stm32f1xx_hal_msp.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f1xx_hal_msp.d" -MT"Core/Src/stm32f1xx_hal_msp.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/stm32f1xx_hal_msp.o"
@@ -36,21 +48,283 @@ arm-none-eabi-gcc "../Core/Src/syscalls.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBU
 arm-none-eabi-gcc "../Core/Src/sysmem.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/sysmem.d" -MT"Core/Src/sysmem.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/sysmem.o"
 arm-none-eabi-gcc "../Core/Src/system_stm32f1xx.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/system_stm32f1xx.d" -MT"Core/Src/system_stm32f1xx.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/system_stm32f1xx.o"
 arm-none-eabi-gcc "../Core/Src/tim.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/tim.d" -MT"Core/Src/tim.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/tim.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:190:5: error: 'short_raw_adc' undeclared (first use in this function)
+  190 |     short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:190:5: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:191:5: error: 'long_raw_adc' undeclared (first use in this function)
+  191 |     long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:192:5: error: 'left_raw_adc' undeclared (first use in this function)
+  192 |     left_raw_adc = SharpManager_GetLeftRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:193:5: error: 'right_raw_adc' undeclared (first use in this function)
+  193 |     right_raw_adc = SharpManager_GetRightRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:194:5: error: 'short_voltage' undeclared (first use in this function)
+  194 |     short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:195:5: error: 'long_voltage' undeclared (first use in this function)
+  195 |     long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:196:5: error: 'left_voltage' undeclared (first use in this function)
+  196 |     left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:197:5: error: 'right_voltage' undeclared (first use in this function)
+  197 |     right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:286:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  286 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:46: Core/Src/main.o] Error 1
+make: *** Waiting for unfinished jobs....
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+14:57:37 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:190:5: error: 'short_raw_adc' undeclared (first use in this function)
+  190 |     short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:190:5: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:191:5: error: 'long_raw_adc' undeclared (first use in this function)
+  191 |     long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:192:5: error: 'left_raw_adc' undeclared (first use in this function)
+  192 |     left_raw_adc = SharpManager_GetLeftRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:193:5: error: 'right_raw_adc' undeclared (first use in this function)
+  193 |     right_raw_adc = SharpManager_GetRightRawAdc(&g_sharp_manager);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:194:5: error: 'short_voltage' undeclared (first use in this function)
+  194 |     short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c:195:5: error: 'long_voltage' undeclared (first use in this function)
+  195 |     long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:196:5: error: 'left_voltage' undeclared (first use in this function)
+  196 |     left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:197:5: error: 'right_voltage' undeclared (first use in this function)
+  197 |     right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
+      |     ^~~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:286:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  286 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:46: Core/Src/main.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+15:02:39 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:286:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  286 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
 arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: 4wheel.elf
  
 arm-none-eabi-size  4wheel.elf 
 arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
    text	   data	    bss	    dec	    hex	filename
-  23444	    108	   3960	  27512	   6b78	4wheel.elf
+  28324	    112	   4064	  32500	   7ef4	4wheel.elf
 Finished building: default.size.stdout
  
 Finished building: 4wheel.list
  
-21:29:36 **** Incremental Build of configuration Debug for project 4wheel ****
+15:03:39 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:294:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  294 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 4wheel.elf
+ 
+arm-none-eabi-size  4wheel.elf 
+arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
+   text	   data	    bss	    dec	    hex	filename
+  28196	    112	   4064	  32372	   7e74	4wheel.elf
+Finished building: default.size.stdout
+ 
+Finished building: 4wheel.list
+ 
+15:04:44 **** Incremental Build of configuration Debug for project 4wheel ****
 make -j16 all 
 arm-none-eabi-size  4wheel.elf 
    text	   data	    bss	    dec	    hex	filename
-  23444	    108	   3960	  27512	   6b78	4wheel.elf
+  28196	    112	   4064	  32372	   7e74	4wheel.elf
+Finished building: default.size.stdout
+ 
+15:11:19 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
+../Core/Src/MySrc/seek.c: In function 'Seek_Update':
+../Core/Src/MySrc/seek.c:235:19: error: too few arguments to function 'Seek_IsSeen'
+  235 |     sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm);
+      |                   ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:236:17: error: too few arguments to function 'Seek_IsSeen'
+  236 |     sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm);
+      |                 ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:237:18: error: too few arguments to function 'Seek_IsSeen'
+  237 |     sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm);
+      |                  ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c: At top level:
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/MySrc/subdir.mk:49: Core/Src/MySrc/seek.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+15:11:29 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
+../Core/Src/MySrc/seek.c: In function 'Seek_Update':
+../Core/Src/MySrc/seek.c:235:19: error: too few arguments to function 'Seek_IsSeen'
+  235 |     sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm);
+      |                   ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:236:17: error: too few arguments to function 'Seek_IsSeen'
+  236 |     sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm);
+      |                 ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:237:18: error: too few arguments to function 'Seek_IsSeen'
+  237 |     sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm);
+      |                  ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c: At top level:
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/MySrc/subdir.mk:49: Core/Src/MySrc/seek.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+15:11:46 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
+../Core/Src/MySrc/seek.c: In function 'Seek_Update':
+../Core/Src/MySrc/seek.c:235:19: error: too few arguments to function 'Seek_IsSeen'
+  235 |     sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm);
+      |                   ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:236:17: error: too few arguments to function 'Seek_IsSeen'
+  236 |     sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm);
+      |                 ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:237:18: error: too few arguments to function 'Seek_IsSeen'
+  237 |     sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm);
+      |                  ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c:58:13: note: declared here
+   58 | static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
+      |             ^~~~~~~~~~~
+../Core/Src/MySrc/seek.c: At top level:
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/MySrc/subdir.mk:49: Core/Src/MySrc/seek.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+15:15:02 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
+../Core/Src/MySrc/seek.c: In function 'Seek_Update':
+../Core/Src/MySrc/seek.c:242:48: error: 'g_sharp_manager' undeclared (first use in this function); did you mean 'sharp_manager'?
+  242 |     long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+      |                                                ^~~~~~~~~~~~~~~
+      |                                                sharp_manager
+../Core/Src/MySrc/seek.c:242:48: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/MySrc/seek.c: At top level:
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/MySrc/subdir.mk:49: Core/Src/MySrc/seek.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+15:15:30 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/MySrc/seek.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/MySrc/seek.d" -MT"Core/Src/MySrc/seek.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/MySrc/seek.o"
+../Core/Src/MySrc/seek.c:36:12: warning: 'Seek_ScaleSpeedByCoef' defined but not used [-Wunused-function]
+   36 | static int Seek_ScaleSpeedByCoef(int speed, float coef)
+      |            ^~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 4wheel.elf
+ 
+arm-none-eabi-size  4wheel.elf 
+arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
+Finished building: 4wheel.list
+ 
+17:30:17 **** Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
+17:40:15 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:297:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  297 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 4wheel.elf
+ 
+arm-none-eabi-size  4wheel.elf 
+arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
+   text	   data	    bss	    dec	    hex	filename
+  26396	    108	   4064	  30568	   7768	4wheel.elf
+Finished building: default.size.stdout
+ 
+Finished building: 4wheel.list
+ 
+17:42:31 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:294:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
+  294 | static void MX_USART1_UART_Init(void)
+      |             ^~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 4wheel.elf
+ 
+arm-none-eabi-size  4wheel.elf 
+arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
+Finished building: 4wheel.list
+ 
+17:50:02 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
+17:52:09 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
 Finished building: default.size.stdout
  

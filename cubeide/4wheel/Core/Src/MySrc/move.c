@@ -125,12 +125,12 @@ void Move_SlideFwd(Move *self, bool direction, int strength, float coef)
     if (direction)
     {
         Wheel_SetRotation(&self->left, MOVE_FORWARD, strength);
-        Wheel_SetRotation(&self->right, MOVE_FORWARD, Move_ScaleStrength(strength, coef));
+        Wheel_SetRotation(&self->right, MOVE_BACKWARD, Move_ScaleStrength(strength, coef));
     }
     else
     {
         Wheel_SetRotation(&self->left, MOVE_FORWARD, Move_ScaleStrength(strength, coef));
-        Wheel_SetRotation(&self->right, MOVE_FORWARD, strength);
+        Wheel_SetRotation(&self->right, MOVE_BACKWARD, strength);
     }
     self->moveEndTime = 0U;
 }
@@ -145,12 +145,12 @@ void Move_SlideBwd(Move *self, bool direction, int strength, float coef)
     if (!direction)
     {
         Wheel_SetRotation(&self->left, MOVE_BACKWARD, strength);
-        Wheel_SetRotation(&self->right, MOVE_BACKWARD, Move_ScaleStrength(strength, coef));
+        Wheel_SetRotation(&self->right, MOVE_FORWARD, Move_ScaleStrength(strength, coef));
     }
     else
     {
         Wheel_SetRotation(&self->left, MOVE_BACKWARD, Move_ScaleStrength(strength, coef));
-        Wheel_SetRotation(&self->right, MOVE_BACKWARD, strength);
+        Wheel_SetRotation(&self->right, MOVE_FORWARD, strength);
     }
     self->moveEndTime = 0U;
 }

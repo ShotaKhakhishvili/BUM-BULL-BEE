@@ -35,9 +35,9 @@ typedef struct
     {                                   \
         65.0,                           \
         1.0,                            \
-        120,                            \
-        100,                            \
         150,                            \
+        200,                            \
+        200,                            \
     }
 
 typedef struct

@@ -4,6 +4,7 @@
 "./Core/Src/MySrc/median_calculator.o"
 "./Core/Src/MySrc/move.o"
 "./Core/Src/MySrc/platform_adapter.o"
+"./Core/Src/MySrc/seek.o"
 "./Core/Src/MySrc/sharp_manager.o"
 "./Core/Src/MySrc/sharp_suggest.o"
 "./Core/Src/MySrc/sharp_volt_to_distance.o"
