@@ -328,3 +328,17 @@ arm-none-eabi-size  4wheel.elf
   28404	    112	   4064	  32580	   7f44	4wheel.elf
 Finished building: default.size.stdout
  
+18:16:02 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
+18:19:31 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  28404	    112	   4064	  32580	   7f44	4wheel.elf
+Finished building: default.size.stdout
+ 
