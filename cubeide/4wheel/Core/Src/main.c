@@ -34,6 +34,7 @@
 #include "MySrc/platform_adapter.h"
 #include "MySrc/seek.h"
 #include "MySrc/sharp_manager.h"
+#include "MySrc/debug_light.h"
 
 /* USER CODE END Includes */
 
@@ -70,6 +71,10 @@ static Light g_bl;
 /* Fast seek tuning template: update values here for quick strategy iteration. */
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
+
+static uint32_t g_led_last_change = 0;
+static bool g_led_is_red = true;
+static bool g_led_running = false;
 
 static Light *g_lights[4] =
 {
@@ -154,6 +159,7 @@ int main(void)
   Move_Init(&move);
   Seek_Init(&g_seek);
   Seek_SetTuning(&g_seek, &g_seek_tuning);
+  DebugLight_Init();
 
   {
     uint32_t i;
@@ -198,6 +204,12 @@ int main(void)
       Move_Stop(&move);
       Move_Update(&move);
       g_seek_mode = SEEK_MODE_LOOK;
+      if (g_led_running)
+      {
+        DebugLight_SetColor(0, 0, 0);
+        DebugLight_Send();
+        g_led_running = false;
+      }
       HAL_Delay(5);
       continue;
     }
@@ -247,6 +259,34 @@ int main(void)
     //Move_SlideFwd(&move, ROT_RIGHT, 200, 0.75);
 
     Move_Update(&move);
+
+    if (!g_led_running)
+    {
+      g_led_is_red = true;
+      g_led_last_change = HAL_GetTick();
+      DebugLight_SetColor(255, 0, 0);
+      DebugLight_Send();
+      g_led_running = true;
+    }
+    else
+    {
+      uint32_t now = HAL_GetTick();
+
+      if (g_led_is_red && (now - g_led_last_change) >= 1000U)
+      {
+        DebugLight_SetColor(0, 0, 255);
+        DebugLight_Send();
+        g_led_is_red = false;
+        g_led_last_change = now;
+      }
+      else if (!g_led_is_red && (now - g_led_last_change) >= 2000U)
+      {
+        DebugLight_SetColor(255, 0, 0);
+        DebugLight_Send();
+        g_led_is_red = true;
+        g_led_last_change = now;
+      }
+    }
 
     HAL_Delay(5);
   }
