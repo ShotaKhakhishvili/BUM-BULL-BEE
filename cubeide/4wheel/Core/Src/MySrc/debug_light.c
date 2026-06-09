@@ -1,92 +1,100 @@
 #include "MySrc/debug_light.h"
-#include "tim.h"
 #include "main.h"
 
-#define WS2812B_BITS     24
-#define WS2812B_RESET    50
-#define WS2812B_BUF_LEN (WS2812B_BITS + WS2812B_RESET)
+/* WS2812B bit timing in CPU cycles @ 72 MHz (1 cycle ~= 13.9 ns). */
+#define WS_T1H  58u   /* '1' high ~805 ns */
+#define WS_T1L  32u   /* '1' low  ~445 ns */
+#define WS_T0H  22u   /* '0' high ~305 ns */
+#define WS_T0L  58u   /* '0' low  ~805 ns */
 
-#define WS2812B_ARR      89
-#define WS2812B_ONE      58
-#define WS2812B_ZERO     29
+static uint8_t ws_r;
+static uint8_t ws_g;
+static uint8_t ws_b;
 
-extern DMA_HandleTypeDef hdma_tim2_ch1;
+static void DWT_Start(void)
+{
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
 
-static uint16_t ws_buf[WS2812B_BUF_LEN];
-static volatile bool ws_busy = false;
+static inline void delay_cycles(uint32_t cycles)
+{
+    uint32_t start = DWT->CYCCNT;
+    while ((DWT->CYCCNT - start) < cycles)
+    {
+    }
+}
 
 void DebugLight_Init(void)
 {
-    uint32_t i;
     GPIO_InitTypeDef gpio = {0};
 
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
     gpio.Pin = GPIO_PIN_0;
-    gpio.Mode = GPIO_MODE_AF_PP;
+    gpio.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio.Pull = GPIO_NOPULL;
     gpio.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOA, &gpio);
 
-    __HAL_TIM_SET_AUTORELOAD(&htim2, WS2812B_ARR);
-    __HAL_TIM_SET_COUNTER(&htim2, 0);
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+    GPIOA->BRR = GPIO_PIN_0;   /* idle low */
 
-    HAL_DMA_DeInit(&hdma_tim2_ch1);
-    hdma_tim2_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_tim2_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim2_ch1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim2_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_tim2_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_tim2_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim2_ch1.Init.Priority = DMA_PRIORITY_LOW;
-    HAL_DMA_Init(&hdma_tim2_ch1);
+    DWT_Start();
 
-    for (i = 0; i < WS2812B_BUF_LEN; i++)
-    {
-        ws_buf[i] = 0;
-    }
-
+    /* boot sanity flash: green */
     DebugLight_SetColor(0, 255, 0);
     DebugLight_Send();
-    while (ws_busy) {}
 }
 
 void DebugLight_SetColor(uint8_t r, uint8_t g, uint8_t b)
 {
-    uint32_t grb;
-    int i;
+    ws_r = r;
+    ws_g = g;
+    ws_b = b;
+}
 
-    grb = ((uint32_t)g << 16) | ((uint32_t)r << 8) | (uint32_t)b;
+static void ws_send_byte(uint8_t val)
+{
+    uint8_t i;
 
-    for (i = 0; i < 24; i++)
+    for (i = 0; i < 8u; i++)
     {
-        ws_buf[i] = (grb & (1U << (23 - i))) ? WS2812B_ONE : WS2812B_ZERO;
+        if (val & 0x80u)
+        {
+            GPIOA->BSRR = GPIO_PIN_0;
+            delay_cycles(WS_T1H);
+            GPIOA->BRR = GPIO_PIN_0;
+            delay_cycles(WS_T1L);
+        }
+        else
+        {
+            GPIOA->BSRR = GPIO_PIN_0;
+            delay_cycles(WS_T0H);
+            GPIOA->BRR = GPIO_PIN_0;
+            delay_cycles(WS_T0L);
+        }
+        val <<= 1;
     }
 }
 
 void DebugLight_Send(void)
 {
-    if (ws_busy)
-    {
-        return;
-    }
+    uint32_t primask = __get_PRIMASK();
 
-    ws_busy = true;
-    if (HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1,
-                               (uint32_t *)ws_buf, WS2812B_BUF_LEN) != HAL_OK)
-    {
-        ws_busy = false;
-    }
+    __disable_irq();
+
+    ws_send_byte(ws_g);
+    ws_send_byte(ws_r);
+    ws_send_byte(ws_b);
+
+    __set_PRIMASK(primask);
+
+    GPIOA->BRR = GPIO_PIN_0;   /* hold low for reset latch (>50 us) */
+    delay_cycles(72u * 60u);
 }
 
 bool DebugLight_IsBusy(void)
 {
-    return ws_busy;
-}
-
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim->Instance == TIM2)
-    {
-        HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_1);
-        ws_busy = false;
-    }
+    return false;
 }
