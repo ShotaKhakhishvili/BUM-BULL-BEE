@@ -134,6 +134,7 @@ int main(void)
   MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {

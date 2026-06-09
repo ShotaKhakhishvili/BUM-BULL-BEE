@@ -35,6 +35,7 @@ void MX_ADC1_Init(void)
 
   /* USER CODE END ADC1_Init 0 */
 
+  ADC_AnalogWDGConfTypeDef AnalogWDGConfig = {0};
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
@@ -55,11 +56,23 @@ void MX_ADC1_Init(void)
     Error_Handler();
   }
 
+  /** Configure Analog WatchDog 1
+  */
+  AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
+  AnalogWDGConfig.HighThreshold = 0;
+  AnalogWDGConfig.LowThreshold = 0;
+  AnalogWDGConfig.Channel = ADC_CHANNEL_1;
+  AnalogWDGConfig.ITMode = DISABLE;
+  if (HAL_ADC_AnalogWDGConfig(&hadc1, &AnalogWDGConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
   /** Configure Regular Channel
   */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_41CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
