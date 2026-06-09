@@ -193,6 +193,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) != GPIO_PIN_SET)
+    {
+      Move_Stop(&move);
+      Move_Update(&move);
+      g_seek_mode = SEEK_MODE_LOOK;
+      HAL_Delay(5);
+      continue;
+    }
+
     SharpManager_Update(&g_sharp_manager);
     CloseIR_Update(&g_close_ir);
 
