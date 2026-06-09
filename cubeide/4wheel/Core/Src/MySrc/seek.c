@@ -171,16 +171,16 @@ static float Seek_CalcualteRotationCoefficient(
         if(absDiff < 0)
             absDiff = -absDiff;
 
-        return 1 - (absDiff / 255);
+        return 1 - (absDiff / 255) * 5;
     }
     if(!sees_left && !sees_right)
     {
         return 1.0f;
     }
     if(!sees_middle)
-        return 0.1f;
+        return 0.05f;
 
-    return 0.2f;
+    return 0.1f;
 }
 
 void Seek_Init(Seek *self)
