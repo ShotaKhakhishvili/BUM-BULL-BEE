@@ -1,4 +1,5 @@
 "./Core/Src/MySrc/close_ir.o"
+"./Core/Src/MySrc/debug_light.o"
 "./Core/Src/MySrc/debug_vars.o"
 "./Core/Src/MySrc/light.o"
 "./Core/Src/MySrc/median_calculator.o"
