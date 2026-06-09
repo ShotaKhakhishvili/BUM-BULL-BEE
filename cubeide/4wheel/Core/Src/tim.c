@@ -163,8 +163,8 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     /* TIM2 DMA Init */
     /* TIM2_CH1 Init */
     hdma_tim2_ch1.Instance = DMA1_Channel5;
-    hdma_tim2_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_tim2_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_tim2_ch1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_tim2_ch1.Init.PeriphInc = DMA_PINC_ENABLE;
     hdma_tim2_ch1.Init.MemInc = DMA_MINC_ENABLE;
     hdma_tim2_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
     hdma_tim2_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
@@ -178,7 +178,15 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     __HAL_LINKDMA(tim_baseHandle,hdma[TIM_DMA_ID_CC1],hdma_tim2_ch1);
 
   /* USER CODE BEGIN TIM2_MspInit 1 */
-
+    /* WS2812B drives PA0=TIM2_CH1 via PWM+DMA, which needs memory->peripheral.
+       CubeMX generates this DMA as input-capture (PERIPH_TO_MEMORY); override
+       here so the fix survives code regeneration from the .ioc. */
+    hdma_tim2_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_tim2_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
+    if (HAL_DMA_Init(&hdma_tim2_ch1) != HAL_OK)
+    {
+      Error_Handler();
+    }
   /* USER CODE END TIM2_MspInit 1 */
   }
   else if(tim_baseHandle->Instance==TIM4)
