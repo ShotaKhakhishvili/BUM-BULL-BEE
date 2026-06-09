@@ -73,6 +73,10 @@ static Light g_bl;
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
+static uint32_t g_led_last_change = 0;
+static bool g_led_is_red = true;
+static bool g_led_running = false;
+
 static Light *g_lights[4] =
 {
   &g_fr,
@@ -138,7 +142,6 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   MX_I2C2_Init();
-
   /* USER CODE BEGIN 2 */
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
@@ -169,52 +172,60 @@ int main(void)
     }
   }
 
+  /* 
+    Move_RotateOnPoint(&move, ROT_RIGHT, 100);
+
+    HAL_Delay(2000);
+
+    Move_RotateOnPoint(&move, ROT_LEFT, 100);
+
+    HAL_Delay(2000);
+
+    Move_Walk(&move, true, 0);
+  */
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    int short_raw_adc;
-    int long_raw_adc;
-    int left_raw_adc;
-    int right_raw_adc;
-    double short_voltage;
-    double long_voltage;
-    double left_voltage;
-    double right_voltage;
+	    int short_raw_adc;
+	    int long_raw_adc;
+	    int left_raw_adc;
+	    int right_raw_adc;
+	    double short_voltage;
+	    double long_voltage;
+	    double left_voltage;
+	    double right_voltage;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    /* --- WS2812B: cycle red -> blue -> green, 1 second each --- */
+    if (!g_led_running)
     {
-      static uint8_t  s_color_step = 0U;
-      static uint32_t s_led_last_change = 0U;
-      static bool     s_led_running = false;
+      g_led_is_red = true;
+      g_led_last_change = HAL_GetTick();
+      WS2812B_SetColor(0, 255, 0, 0);
+      WS2812B_Send();
+      g_led_running = true;
+    }
+    else
+    {
       uint32_t now = HAL_GetTick();
 
-      if (!s_led_running)
+      if (g_led_is_red && (now - g_led_last_change) >= 1000U)
       {
-        s_color_step      = 0U;
-        s_led_last_change = now;
-        WS2812B_SetColor(0, 255, 0, 0);   /* red */
+        WS2812B_SetColor(0, 0, 0, 255);
         WS2812B_Send();
-        s_led_running = true;
+        g_led_is_red = false;
+        g_led_last_change = now;
       }
-      else if ((now - s_led_last_change) >= 1000U)
+      else if (!g_led_is_red && (now - g_led_last_change) >= 2000U)
       {
-        s_led_last_change = now;
-        s_color_step = (s_color_step + 1U) % 3U;
-
-        switch (s_color_step)
-        {
-          case 0U: WS2812B_SetColor(0, 255,   0,   0); break;  /* red   */
-          case 1U: WS2812B_SetColor(0,   0,   0, 255); break;  /* blue  */
-          case 2U: WS2812B_SetColor(0,   0, 255,   0); break;  /* green */
-          default: break;
-        }
+        WS2812B_SetColor(0, 255, 0, 0);
         WS2812B_Send();
+        g_led_is_red = true;
+        g_led_last_change = now;
       }
     }
 
@@ -231,22 +242,21 @@ int main(void)
     CloseIR_Update(&g_close_ir);
 
     short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
-    long_raw_adc  = SharpManager_GetLongRawAdc(&g_sharp_manager);
-    left_raw_adc  = SharpManager_GetLeftRawAdc(&g_sharp_manager);
+    long_raw_adc = SharpManager_GetLongRawAdc(&g_sharp_manager);
+    left_raw_adc = SharpManager_GetLeftRawAdc(&g_sharp_manager);
     right_raw_adc = SharpManager_GetRightRawAdc(&g_sharp_manager);
-
     short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
-    long_voltage  = SharpManager_AdcToVoltage(long_raw_adc,  3.3, 4095.0);
-    left_voltage  = SharpManager_AdcToVoltage(left_raw_adc,  3.3, 4095.0);
+    long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
+    left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
     right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
 
     g_debug_short_raw_adc = short_raw_adc;
-    g_debug_long_raw_adc  = long_raw_adc;
-    g_debug_left_raw_adc  = left_raw_adc;
+    g_debug_long_raw_adc = long_raw_adc;
+    g_debug_left_raw_adc = left_raw_adc;
     g_debug_right_raw_adc = right_raw_adc;
     g_debug_short_voltage = (float)short_voltage;
-    g_debug_long_voltage  = (float)long_voltage;
-    g_debug_left_voltage  = (float)left_voltage;
+    g_debug_long_voltage = (float)long_voltage;
+    g_debug_left_voltage = (float)left_voltage;
     g_debug_right_voltage = (float)right_voltage;
 
     MedianCalculator_Update(
@@ -263,12 +273,14 @@ int main(void)
       g_seek_mode = SEEK_MODE_LOOK;
     }
 
-    if (SharpManager_GetMiddleDistance(&g_sharp_manager) < 30 && !Seek_IsTargetVisible(&g_seek))
+    if(SharpManager_GetMiddleDistance(&g_sharp_manager) < 30 && !Seek_IsTargetVisible(&g_seek))
     {
-      g_seek_mode = SEEK_MODE_LOOK;
+    	g_seek_mode = SEEK_MODE_LOOK;
     }
 
     Seek_Update(&g_seek, g_seek_mode, &move, &g_sharp_manager);
+
+    //Move_SlideFwd(&move, ROT_RIGHT, 200, 0.75);
 
     Move_Update(&move);
 
@@ -304,8 +316,8 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-                              | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -386,13 +398,13 @@ static void App_InitParityGpio(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
 #ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
@@ -404,6 +416,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
