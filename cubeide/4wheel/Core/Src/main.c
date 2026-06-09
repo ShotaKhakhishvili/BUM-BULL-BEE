@@ -35,7 +35,7 @@
 #include "MySrc/platform_adapter.h"
 #include "MySrc/seek.h"
 #include "MySrc/sharp_manager.h"
-#include "MySrc/debug_light.h"
+#include "MySrc/ws2812b.h"
 
 /* USER CODE END Includes */
 
@@ -161,7 +161,7 @@ int main(void)
   Move_Init(&move);
   Seek_Init(&g_seek);
   Seek_SetTuning(&g_seek, &g_seek_tuning);
-  DebugLight_Init();
+  WS2812B_Init();
 
   {
     uint32_t i;
@@ -205,8 +205,8 @@ int main(void)
     {
       g_led_is_red = true;
       g_led_last_change = HAL_GetTick();
-      DebugLight_SetColor(255, 0, 0);
-      DebugLight_Send();
+      WS2812B_SetColor(0, 255, 0, 0);
+      WS2812B_Send();
       g_led_running = true;
     }
     else
@@ -215,15 +215,15 @@ int main(void)
 
       if (g_led_is_red && (now - g_led_last_change) >= 1000U)
       {
-        DebugLight_SetColor(0, 0, 255);
-        DebugLight_Send();
+        WS2812B_SetColor(0, 0, 0, 255);
+        WS2812B_Send();
         g_led_is_red = false;
         g_led_last_change = now;
       }
       else if (!g_led_is_red && (now - g_led_last_change) >= 2000U)
       {
-        DebugLight_SetColor(255, 0, 0);
-        DebugLight_Send();
+        WS2812B_SetColor(0, 255, 0, 0);
+        WS2812B_Send();
         g_led_is_red = true;
         g_led_last_change = now;
       }
