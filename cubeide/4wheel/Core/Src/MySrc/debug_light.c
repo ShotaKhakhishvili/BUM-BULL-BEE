@@ -26,6 +26,8 @@ void DebugLight_Init(void)
     HAL_GPIO_Init(GPIOA, &gpio);
 
     __HAL_TIM_SET_AUTORELOAD(&htim2, WS2812B_ARR);
+    __HAL_TIM_SET_COUNTER(&htim2, 0);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
 
     HAL_DMA_DeInit(&hdma_tim2_ch1);
     hdma_tim2_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
@@ -41,6 +43,10 @@ void DebugLight_Init(void)
     {
         ws_buf[i] = 0;
     }
+
+    DebugLight_SetColor(0, 255, 0);
+    DebugLight_Send();
+    while (ws_busy) {}
 }
 
 void DebugLight_SetColor(uint8_t r, uint8_t g, uint8_t b)
@@ -64,8 +70,11 @@ void DebugLight_Send(void)
     }
 
     ws_busy = true;
-    HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1,
-                           (uint32_t *)ws_buf, WS2812B_BUF_LEN);
+    if (HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1,
+                               (uint32_t *)ws_buf, WS2812B_BUF_LEN) != HAL_OK)
+    {
+        ws_busy = false;
+    }
 }
 
 bool DebugLight_IsBusy(void)

@@ -201,17 +201,39 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (!g_led_running)
+    {
+      g_led_is_red = true;
+      g_led_last_change = HAL_GetTick();
+      DebugLight_SetColor(255, 0, 0);
+      DebugLight_Send();
+      g_led_running = true;
+    }
+    else
+    {
+      uint32_t now = HAL_GetTick();
+
+      if (g_led_is_red && (now - g_led_last_change) >= 1000U)
+      {
+        DebugLight_SetColor(0, 0, 255);
+        DebugLight_Send();
+        g_led_is_red = false;
+        g_led_last_change = now;
+      }
+      else if (!g_led_is_red && (now - g_led_last_change) >= 2000U)
+      {
+        DebugLight_SetColor(255, 0, 0);
+        DebugLight_Send();
+        g_led_is_red = true;
+        g_led_last_change = now;
+      }
+    }
+
     if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) != GPIO_PIN_SET)
     {
       Move_Stop(&move);
       Move_Update(&move);
       g_seek_mode = SEEK_MODE_LOOK;
-      if (g_led_running)
-      {
-        DebugLight_SetColor(0, 0, 0);
-        DebugLight_Send();
-        g_led_running = false;
-      }
       HAL_Delay(5);
       continue;
     }
@@ -261,34 +283,6 @@ int main(void)
     //Move_SlideFwd(&move, ROT_RIGHT, 200, 0.75);
 
     Move_Update(&move);
-
-    if (!g_led_running)
-    {
-      g_led_is_red = true;
-      g_led_last_change = HAL_GetTick();
-      DebugLight_SetColor(255, 0, 0);
-      DebugLight_Send();
-      g_led_running = true;
-    }
-    else
-    {
-      uint32_t now = HAL_GetTick();
-
-      if (g_led_is_red && (now - g_led_last_change) >= 1000U)
-      {
-        DebugLight_SetColor(0, 0, 255);
-        DebugLight_Send();
-        g_led_is_red = false;
-        g_led_last_change = now;
-      }
-      else if (!g_led_is_red && (now - g_led_last_change) >= 2000U)
-      {
-        DebugLight_SetColor(255, 0, 0);
-        DebugLight_Send();
-        g_led_is_red = true;
-        g_led_last_change = now;
-      }
-    }
 
     HAL_Delay(5);
   }
