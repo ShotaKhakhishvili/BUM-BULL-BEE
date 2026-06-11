@@ -57,7 +57,7 @@ static int Seek_ScaleSpeedByCoef(int speed, float coef)
 
 static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
 {
-	if(volt <= 0.216)
+	if(volt <= 0.5)
 		return false;
 
     return (distance_cm > 0.0) && (distance_cm <= threshold_cm);
