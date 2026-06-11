@@ -1,8 +1,10 @@
 #include "Defines.hpp"
 #include "Infrared.hpp"
 
-void Infrared::Init()
+void Infrared::Init(int pin)
 {
+    this->pin = pin;
+
     lastUpdateTime = -INFRARED_UPDATE_INTERVAL;
 
     Distance();
@@ -14,7 +16,7 @@ double Infrared::Distance()
 
     if (now >= INFRARED_UPDATE_INTERVAL + lastUpdateTime)
     {
-        this->rawAdc = analogRead(INFRARED);
+        this->rawAdc = analogRead(this->pin);
         this->volt = AdcToVoltage(rawAdc);
         this->distance = ((INFRARED_MAX_ADC - rawAdc) / INFRARED_MAX_ADC) * INFRARED_MAX_DISTANCE;
 

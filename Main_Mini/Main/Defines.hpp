@@ -12,8 +12,10 @@
 
 // ------------------- DISTANCE SENSORS ----------------------
 
-#define IR          3
-#define INFRARED    4     // analog pin for the linear IR sensor
+#define IR              A0
+#define INFRARED_L      A1
+#define INFRARED_M      A2
+#define INFRARED_R      A3
 
 #define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 #define SHARP_UPDATE_INTERVAL 40

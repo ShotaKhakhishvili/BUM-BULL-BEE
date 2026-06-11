@@ -1,12 +1,12 @@
 #include "Move.hpp"
 
-void Move::rotateOnPoint(bool dir, int str)
+void Move::RotateOnPoint(bool dir, int str)
 {
   L.setRotation(dir, str);
   R.setRotation(!dir, str);
 }
 
-void Move::rotateOnSide(bool dir, int str)
+void Move::RotateOnSide(bool dir, int str)
 {
   if(dir)
   {
@@ -19,13 +19,13 @@ void Move::rotateOnSide(bool dir, int str)
     R.setRotation(BACKWARD, str);
   }
 }
-void Move::walk(bool dir, int str)
+void Move::Walk(bool dir, int str)
 {
   L.setRotation(dir, str);
   R.setRotation(dir, str);
 }
 
-void Move::slideFwd(bool dir, int str, float coef)
+void Move::SlideFwd(bool dir, int str, float coef)
 {
   if(!dir)
   {
@@ -39,7 +39,7 @@ void Move::slideFwd(bool dir, int str, float coef)
   }
 }
 
-void Move::slideBwd(bool dir, int str, float coef)
+void Move::SlideBwd(bool dir, int str, float coef)
 {
   if(dir)
   {

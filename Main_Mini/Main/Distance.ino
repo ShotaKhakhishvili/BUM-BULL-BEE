@@ -4,7 +4,7 @@
 void Distance::Init()
 {
     sharp.Init();
-    infrared.Init();
+    infrared.Init(INFRARED_M);
 }
 
 double Distance::Get()
