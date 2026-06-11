@@ -62,8 +62,7 @@ namespace SharpConvertions
             { 0.526, 50.0 },
             { 0.498, 55.0 },
             { 0.488, 60.0 },
-            { 0.480, 65.0 },
-            { 0.470, 70.0 }
+            { 0.480, 65.0 }
         };
 
         return InterpolateDistanceFromVoltage(voltage, table, sizeof(table) / sizeof(table[0]));
