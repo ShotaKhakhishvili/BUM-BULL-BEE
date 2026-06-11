@@ -32,18 +32,18 @@ void setup()
 
 void loop()
 {
-    distance.DebugPrint(0b11);
-    infraL.DebugPrint();
-    infraR.DebugPrint();
+    //distance.DebugPrint(0b11);
+    //infraL.DebugPrint();
+    //infraR.DebugPrint();
 
-    //distance.GetSharp();
+    distance.GetSharp();
 
-    //Serial.print("Sharp | samples: ");
-    //Serial.print(SharpMedian::Count());
-    //Serial.print("/");
-    //Serial.print(SharpMedian::SAMPLE_SIZE);
-    //Serial.print(" | Median Voltage: ");
-    //Serial.println(SharpMedian::GetMedianVoltage(), kPrintDigitsAfterDecimal);
+    Serial.print("Sharp | samples: ");
+    Serial.print(SharpMedian::Count());
+    Serial.print("/");
+    Serial.print(SharpMedian::SAMPLE_SIZE);
+    Serial.print(" | Median Voltage: ");
+    Serial.println(SharpMedian::GetMedianVoltage(), kPrintDigitsAfterDecimal);
 
     Serial.println();
     delay(500);
