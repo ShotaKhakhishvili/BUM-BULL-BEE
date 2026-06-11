@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#define LED           PC13
+#define LED  13
 
 // Debug
 
@@ -12,8 +12,8 @@
 
 // ------------------- DISTANCE SENSORS ----------------------
 
-#define IR          PA3
-#define INFRARED    PA4     // analog pin for the linear IR sensor
+#define IR          3
+#define INFRARED    4     // analog pin for the linear IR sensor
 
 #define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 #define SHARP_UPDATE_INTERVAL 40
@@ -25,14 +25,14 @@
 
 // -------------------- WHEELS -------------------------------
 
-#define WH_RB         PB6 
-#define WH_RF         PB7 
-#define WH_LF         PB8 
-#define WH_LB         PB9 
+#define WH_RB         6 
+#define WH_RF         7 
+#define WH_LF         8 
+#define WH_LB         9 
 
 // -------------------- OTHERS -------------------------------
 
-#define RESET         PB13
+#define RESET         13
 
 #define SW_ON         1
 #define SW_OFF        0
