@@ -1,11 +1,13 @@
 #include "Defines.hpp"
 #include "Distance.hpp"
 #include "SharpMedian.hpp"
+#include "Tof.hpp"
 
 #include "Move.hpp"
 
 Distance distance;
 Infrared infraL, infraR;
+Tof tof;
 
 void setup()
 {
@@ -28,6 +30,7 @@ void setup()
     distance.Init();
     infraL.Init(INFRARED_L);
     infraR.Init(INFRARED_R);
+    tof.Init();
 }
 
 void loop()
@@ -35,6 +38,7 @@ void loop()
     distance.DebugPrint(0b11);
     infraL.DebugPrint();
     infraR.DebugPrint();
+    tof.DebugPrint();
 
     /*
 
