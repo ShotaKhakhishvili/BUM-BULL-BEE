@@ -73,6 +73,9 @@ static Light g_bl;
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
+/* Robot run state driven by the PB8 remote line (EXTI): 1 = on, 0 = off. */
+static volatile bool g_robot_on = false;
+
 static Light *g_lights[4] =
 {
   &g_fr,
@@ -160,6 +163,9 @@ int main(void)
   Seek_SetTuning(&g_seek, &g_seek_tuning);
   WS2812B_Init();
 
+  /* Seed the run state from the current PA8 level; the EXTI keeps it updated. */
+  g_robot_on = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_SET);
+
   {
     uint32_t i;
 
@@ -187,44 +193,28 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    /* --- WS2812B: cycle red -> blue -> green, 1 second each --- */
-    {
-      static uint8_t  s_color_step = 0U;
-      static uint32_t s_led_last_change = 0U;
-      static bool     s_led_running = false;
-      uint32_t now = HAL_GetTick();
-
-      if (!s_led_running)
-      {
-        s_color_step      = 0U;
-        s_led_last_change = now;
-        WS2812B_SetColor(0, 255, 0, 0);   /* red */
-        WS2812B_Send();
-        s_led_running = true;
-      }
-      else if ((now - s_led_last_change) >= 1000U)
-      {
-        s_led_last_change = now;
-        s_color_step = (s_color_step + 1U) % 3U;
-
-        switch (s_color_step)
-        {
-          case 0U: WS2812B_SetColor(0, 255,   0,   0); break;  /* red   */
-          case 1U: WS2812B_SetColor(0,   0,   0, 255); break;  /* blue  */
-          case 2U: WS2812B_SetColor(0,   0, 255,   0); break;  /* green */
-          default: break;
-        }
-        WS2812B_Send();
-      }
-    }
-
-    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) != GPIO_PIN_SET)
+    if (!g_robot_on)
     {
       Move_Stop(&move);
       Move_Update(&move);
       g_seek_mode = SEEK_MODE_LOOK;
       HAL_Delay(5);
       continue;
+    }
+
+    /* WS2812B heartbeat blink */
+    {
+      static uint32_t s_led_last = 0U;
+      static bool     s_led_on = false;
+      uint32_t now = HAL_GetTick();
+
+      if ((now - s_led_last) >= 500U)
+      {
+        s_led_last = now;
+        s_led_on = !s_led_on;
+        WS2812B_SetColor(0, s_led_on ? 255U : 0U, 0U, 0U);
+        WS2812B_Send();
+      }
     }
 
     SharpManager_Update(&g_sharp_manager);
@@ -375,6 +365,19 @@ static void App_InitParityGpio(void)
   gpio.Mode = GPIO_MODE_INPUT;
   gpio.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &gpio);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == GPIO_PIN_8)
+  {
+    g_robot_on = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_SET);
+
+    if (!g_robot_on)
+    {
+      g_seek_mode = SEEK_MODE_LOOK;
+    }
+  }
 }
 
 /* USER CODE END 4 */
