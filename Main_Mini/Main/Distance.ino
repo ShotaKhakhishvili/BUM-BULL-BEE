@@ -14,6 +14,11 @@ double Distance::Get()
     return infrared.Distance();
 }
 
+double Distance::GetSharp()
+{
+    return sharp.Distance();
+}
+
 void Distance::DebugPrint(int whatToDebug)
 {
     if(whatToDebug & 0b01)

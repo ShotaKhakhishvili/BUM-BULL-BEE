@@ -1,5 +1,6 @@
 #include "Defines.hpp"
 #include "Sharp.hpp"
+#include "SharpMedian.hpp"
 
 namespace SharpConvertions
 {
@@ -132,6 +133,8 @@ double Sharp::Distance()
     {
         this->rawAdc = analogRead(IR);
         this->volt = AdcToVoltage(rawAdc);
+
+        SharpMedian::Update(volt);
 
         const double reading = SharpConvertions::ConvertLongVoltageToDistance(volt);
 
