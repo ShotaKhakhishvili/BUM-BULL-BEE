@@ -32,9 +32,11 @@ void setup()
 
 void loop()
 {
-    //distance.DebugPrint(0b11);
-    //infraL.DebugPrint();
-    //infraR.DebugPrint();
+    distance.DebugPrint(0b11);
+    infraL.DebugPrint();
+    infraR.DebugPrint();
+
+    /*
 
     distance.GetSharp();
 
@@ -46,5 +48,7 @@ void loop()
         SharpMedian::Reset();
     }
 
-    delay(10);
+    */
+
+    delay(500);
 }
