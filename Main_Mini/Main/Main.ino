@@ -38,13 +38,13 @@ void loop()
 
     distance.GetSharp();
 
-    Serial.print("Sharp | samples: ");
-    Serial.print(SharpMedian::Count());
-    Serial.print("/");
-    Serial.print(SharpMedian::SAMPLE_SIZE);
-    Serial.print(" | Median Voltage: ");
-    Serial.println(SharpMedian::GetMedianVoltage(), kPrintDigitsAfterDecimal);
+    if (SharpMedian::Count() >= SharpMedian::SAMPLE_SIZE)
+    {
+        Serial.print("Sharp | Median Voltage: ");
+        Serial.println(SharpMedian::GetMedianVoltage(), kPrintDigitsAfterDecimal);
 
-    Serial.println();
-    delay(500);
+        SharpMedian::Reset();
+    }
+
+    delay(10);
 }

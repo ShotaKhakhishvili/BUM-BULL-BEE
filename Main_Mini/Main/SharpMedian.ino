@@ -19,6 +19,12 @@ namespace SharpMedian
         return filled;
     }
 
+    void Reset()
+    {
+        head = 0;
+        filled = 0;
+    }
+
     double GetMedianVoltage()
     {
         if (filled == 0)
