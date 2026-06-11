@@ -1,5 +1,5 @@
 #include "Defines.hpp"
-#include "Sharp.hpp"
+#include "Distance.hpp"
 
 Distance distance;
 
@@ -17,6 +17,7 @@ void setup()
     pinMode(RESET, INPUT);
 
     pinMode(IR, INPUT);
+    pinMode(INFRARED, INPUT);
 
     distance.Init();
 }

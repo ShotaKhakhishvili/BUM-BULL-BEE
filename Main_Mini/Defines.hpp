@@ -20,6 +20,7 @@
 #define SHARP_SMOOTHING_ALPHA 0.3   // EMA weight: higher = snappier, lower = smoother
 #define INFRARED_UPDATE_INTERVAL 40
 
+#define INFRARED_MAX_ADC      1023.0   // full-scale ADC count
 #define INFRARED_MAX_DISTANCE 5.0      // cm when ADC reads 0 (sensor at full voltage)
 
 // -------------------- WHEELS -------------------------------

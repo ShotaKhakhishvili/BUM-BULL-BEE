@@ -1,5 +1,11 @@
 #pragma once
 
+struct SamplePoint
+{
+    double voltage;
+    double distanceCm;
+};
+
 class Sharp
 {
 public:

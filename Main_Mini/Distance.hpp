@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Sharp.hpp"
+#include "Infrared.hpp"
+
 class Distance
 {
 public:
