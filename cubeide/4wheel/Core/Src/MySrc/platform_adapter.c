@@ -124,11 +124,6 @@ uint32_t Platform_Millis(void)
     return HAL_GetTick();
 }
 
-uint16_t Platform_ReadIrSmlAdc(void)
-{
-    return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_SML);
-}
-
 uint16_t Platform_ReadIrMAdc(void)
 {
     return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_M);

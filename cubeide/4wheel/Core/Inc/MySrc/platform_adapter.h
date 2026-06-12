@@ -5,23 +5,22 @@
 #include <stdint.h>
 
 #ifndef PLATFORM_ADC_CHANNEL_COUNT
-#define PLATFORM_ADC_CHANNEL_COUNT 5U
+#define PLATFORM_ADC_CHANNEL_COUNT 4U
 #endif
 
-#ifndef PLATFORM_ADC_IDX_IR_SML
-#define PLATFORM_ADC_IDX_IR_SML 1U /* PA2 / ADC1_IN2 */
-#endif
+/* The short forward Sharp (PA2 / ADC1_IN2) has been replaced by the VL53L0X ToF
+ * sensor and removed from the ADC scan. Remaining ranks renumbered accordingly. */
 
 #ifndef PLATFORM_ADC_IDX_IR_M
-#define PLATFORM_ADC_IDX_IR_M 2U /* PA3 / ADC1_IN3 */
+#define PLATFORM_ADC_IDX_IR_M 1U /* PA3 / ADC1_IN3 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_R
-#define PLATFORM_ADC_IDX_IR_R 4U /* PA7 / ADC1_IN7 */
+#define PLATFORM_ADC_IDX_IR_R 3U /* PA7 / ADC1_IN7 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_L
-#define PLATFORM_ADC_IDX_IR_L 3U /* PA6 / ADC1_IN6 */
+#define PLATFORM_ADC_IDX_IR_L 2U /* PA6 / ADC1_IN6 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_CLOSE_A
@@ -29,7 +28,6 @@
 #endif
 
 uint32_t Platform_Millis(void);
-uint16_t Platform_ReadIrSmlAdc(void);
 uint16_t Platform_ReadIrMAdc(void);
 uint16_t Platform_ReadIrRAdc(void);
 uint16_t Platform_ReadIrLAdc(void);

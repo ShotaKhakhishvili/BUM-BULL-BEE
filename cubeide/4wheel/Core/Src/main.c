@@ -29,12 +29,14 @@
 
 #include "MySrc/close_ir.h"
 #include "MySrc/debug_vars.h"
+#include "MySrc/forward_range.h"
 #include "MySrc/light.h"
 #include "MySrc/median_calculator.h"
 #include "MySrc/move.h"
 #include "MySrc/platform_adapter.h"
 #include "MySrc/seek.h"
 #include "MySrc/sharp_manager.h"
+#include "MySrc/vl53l0x.h"
 #include "MySrc/ws2812b.h"
 
 /* USER CODE END Includes */
@@ -57,9 +59,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint16_t adc_raw[5] = {0};
+volatile uint16_t adc_raw[4] = {0};
 
 static SharpManager g_sharp_manager;
+static Vl53l0x g_tof;
+static ForwardRange g_forward;
 static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
 static Move move;
@@ -143,7 +147,7 @@ int main(void)
   MX_I2C2_Init();
 
   /* USER CODE BEGIN 2 */
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -156,6 +160,8 @@ int main(void)
   App_InitParityGpio();
 
   SharpManager_Init(&g_sharp_manager);
+  Vl53l0x_Init(&g_tof);
+  ForwardRange_Init(&g_forward, &g_tof, &g_sharp_manager);
   CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
   Move_Init(&move);
@@ -181,14 +187,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    int short_raw_adc;
-    int long_raw_adc;
+    int middle_raw_adc;
     int left_raw_adc;
     int right_raw_adc;
-    double short_voltage;
-    double long_voltage;
+    double middle_voltage;
     double left_voltage;
     double right_voltage;
+    double tof_cm;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -218,31 +223,34 @@ int main(void)
     }
 
     SharpManager_Update(&g_sharp_manager);
+    Vl53l0x_Update(&g_tof);
+    ForwardRange_Update(&g_forward);
     CloseIR_Update(&g_close_ir);
 
-    short_raw_adc = SharpManager_GetShortRawAdc(&g_sharp_manager);
-    long_raw_adc  = SharpManager_GetLongRawAdc(&g_sharp_manager);
-    left_raw_adc  = SharpManager_GetLeftRawAdc(&g_sharp_manager);
-    right_raw_adc = SharpManager_GetRightRawAdc(&g_sharp_manager);
+    middle_raw_adc = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_MIDDLE);
+    left_raw_adc   = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_LEFT);
+    right_raw_adc  = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_RIGHT);
 
-    short_voltage = SharpManager_AdcToVoltage(short_raw_adc, 3.3, 4095.0);
-    long_voltage  = SharpManager_AdcToVoltage(long_raw_adc,  3.3, 4095.0);
-    left_voltage  = SharpManager_AdcToVoltage(left_raw_adc,  3.3, 4095.0);
-    right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
+    middle_voltage = SharpManager_AdcToVoltage(middle_raw_adc, 3.3, 4095.0);
+    left_voltage   = SharpManager_AdcToVoltage(left_raw_adc,   3.3, 4095.0);
+    right_voltage  = SharpManager_AdcToVoltage(right_raw_adc,  3.3, 4095.0);
 
-    g_debug_short_raw_adc = short_raw_adc;
-    g_debug_long_raw_adc  = long_raw_adc;
+    tof_cm = Vl53l0x_GetDistanceCm(&g_tof);
+
+    /* The old short-Sharp debug slots now carry ToF telemetry. */
+    g_debug_short_raw_adc = (int32_t)Vl53l0x_GetDistanceMm(&g_tof);
+    g_debug_long_raw_adc  = middle_raw_adc;
     g_debug_left_raw_adc  = left_raw_adc;
     g_debug_right_raw_adc = right_raw_adc;
-    g_debug_short_voltage = (float)short_voltage;
-    g_debug_long_voltage  = (float)long_voltage;
+    g_debug_short_voltage = (float)tof_cm;
+    g_debug_long_voltage  = (float)middle_voltage;
     g_debug_left_voltage  = (float)left_voltage;
     g_debug_right_voltage = (float)right_voltage;
 
     MedianCalculator_Update(
         &g_median_calculator,
-        short_voltage,
-        long_voltage);
+        tof_cm,
+        middle_voltage);
 
     if ((g_seek_mode == SEEK_MODE_LOOK) && Seek_IsTargetVisible(&g_seek))
     {
@@ -253,12 +261,12 @@ int main(void)
       g_seek_mode = SEEK_MODE_LOOK;
     }
 
-    if (SharpManager_GetMiddleDistance(&g_sharp_manager) < 30 && !Seek_IsTargetVisible(&g_seek))
+    if (ForwardRange_GetDistanceCm(&g_forward) < 30 && !Seek_IsTargetVisible(&g_seek))
     {
       g_seek_mode = SEEK_MODE_LOOK;
     }
 
-    Seek_Update(&g_seek, g_seek_mode, &move, &g_sharp_manager);
+    Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
 
     Move_Update(&move);
 

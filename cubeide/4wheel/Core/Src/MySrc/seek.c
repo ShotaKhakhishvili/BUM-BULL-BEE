@@ -210,6 +210,7 @@ void Seek_Update(
     Seek *self,
     SeekMode mode,
     Move *move,
+    const ForwardRange *forward,
     const SharpManager *sharp_manager)
 {
     double middle_cm;
@@ -223,31 +224,31 @@ void Seek_Update(
     float rotCoef;
     SeekSteerDirection direction;
 
-    int long_raw_adc;
     int left_raw_adc;
     int right_raw_adc;
-    double long_voltage;
     double left_voltage;
     double right_voltage;
 
-    if ((self == 0) || (move == 0) || (sharp_manager == 0))
+    if ((self == 0) || (move == 0) || (forward == 0) || (sharp_manager == 0))
     {
         return;
     }
 
-    middle_cm = SharpManager_GetMiddleDistance(sharp_manager);
-    left_cm = SharpManager_GetLeftDistance(sharp_manager);
-    right_cm = SharpManager_GetRightDistance(sharp_manager);
+    /* Middle channel now comes from the fused ToF + middle-Sharp combiner. */
+    middle_cm = ForwardRange_GetDistanceCm(forward);
+    left_cm = SharpManager_GetDistance(sharp_manager, SHARP_SENSOR_LEFT);
+    right_cm = SharpManager_GetDistance(sharp_manager, SHARP_SENSOR_RIGHT);
 
-    long_raw_adc = SharpManager_GetLongRawAdc(sharp_manager);
-    left_raw_adc = SharpManager_GetLeftRawAdc(sharp_manager);
-    right_raw_adc = SharpManager_GetRightRawAdc(sharp_manager);
+    left_raw_adc = SharpManager_GetRawAdc(sharp_manager, SHARP_SENSOR_LEFT);
+    right_raw_adc = SharpManager_GetRawAdc(sharp_manager, SHARP_SENSOR_RIGHT);
 
-    long_voltage = SharpManager_AdcToVoltage(long_raw_adc, 3.3, 4095.0);
     left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
     right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
 
-    sees_middle = Seek_IsSeen(middle_cm, self->tuning.see_threshold_cm, long_voltage);
+    /* Middle uses the combiner's own validity instead of the Sharp voltage gate. */
+    sees_middle = ForwardRange_IsValid(forward) &&
+                  (middle_cm > 0.0) &&
+                  (middle_cm <= self->tuning.see_threshold_cm);
     sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm, left_voltage);
     sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm, right_voltage);
 

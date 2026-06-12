@@ -5,6 +5,7 @@
 
 #include "MySrc/move.h"
 #include "MySrc/sharp_manager.h"
+#include "MySrc/forward_range.h"
 
 typedef enum
 {
@@ -55,6 +56,7 @@ void Seek_Update(
     Seek *self,
     SeekMode mode,
     Move *move,
+    const ForwardRange *forward,
     const SharpManager *sharp_manager);
 
 SeekTuning Seek_GetTuning(const Seek *self);

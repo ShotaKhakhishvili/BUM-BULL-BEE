@@ -3,61 +3,39 @@
 
 #include <stdint.h>
 
-#include "MySrc/sharp_suggest.h"
-
+/*
+ * Manages the three forward/side Sharp IR sensors. They are all the same
+ * "long" Sharp type, so they are treated uniformly and addressed by a single
+ * SharpSensor selector instead of one set of functions per sensor.
+ *
+ * The middle sensor used to be the short forward Sharp; it has been physically
+ * replaced by a VL53L0X time-of-flight sensor, and the middle Sharp here is now
+ * simply the long forward sensor (consumed as the Sharp half of ForwardRange).
+ */
 typedef enum
 {
-    SHARP_MODE_LONG = 0,
-    SHARP_MODE_SHORT = 1
-} SharpMode;
+    SHARP_SENSOR_LEFT = 0,
+    SHARP_SENSOR_MIDDLE = 1,
+    SHARP_SENSOR_RIGHT = 2,
+    SHARP_SENSOR_COUNT = 3
+} SharpSensor;
 
 typedef struct
 {
-    uint32_t last_short_read;
-    uint32_t last_long_read;
-    uint32_t last_left_read;
-    uint32_t last_right_read;
-
-    int raw_long_adc;
-    int raw_short_adc;
-    int raw_left_adc;
-    int raw_right_adc;
-
-    double distance_long_cm;
-    double distance_short_cm;
-    double distance_left_cm;
-    double distance_right_cm;
-    double selected_distance_cm;
-
-    SharpMode current_mode;
-    SharpSuggest suggest;
+    uint32_t last_read[SHARP_SENSOR_COUNT];
+    int raw_adc[SHARP_SENSOR_COUNT];
+    double distance_cm[SHARP_SENSOR_COUNT];
 } SharpManager;
 
 void SharpManager_Init(SharpManager *self);
 void SharpManager_Update(SharpManager *self);
 
-double SharpManager_GetMiddleDistance(const SharpManager *self);
-double SharpManager_GetLongDistance(const SharpManager *self);
-double SharpManager_GetShortDistance(const SharpManager *self);
-double SharpManager_GetLeftDistance(const SharpManager *self);
-double SharpManager_GetRightDistance(const SharpManager *self);
-
-double SharpManager_GetRawLongDistance(const SharpManager *self);
-double SharpManager_GetRawShortDistance(const SharpManager *self);
-
-int SharpManager_GetLongRawAdc(const SharpManager *self);
-int SharpManager_GetShortRawAdc(const SharpManager *self);
-int SharpManager_GetLeftRawAdc(const SharpManager *self);
-int SharpManager_GetRightRawAdc(const SharpManager *self);
-
-SharpMode SharpManager_GetMode(const SharpManager *self);
-
-int SharpManager_GetLongAnomalyScore(const SharpManager *self);
-int SharpManager_GetShortAnomalyScore(const SharpManager *self);
+double SharpManager_GetDistance(const SharpManager *self, SharpSensor sensor);
+double SharpManager_GetRawDistance(const SharpManager *self, SharpSensor sensor);
+int SharpManager_GetRawAdc(const SharpManager *self, SharpSensor sensor);
 
 double SharpManager_AdcToVoltage(int adc, double reference_voltage, double max_adc_value);
 
-double SharpManager_ConvertLongVoltageToDistance(double voltage);
-double SharpManager_ConvertShortVoltageToDistance(double voltage);
+double SharpManager_ConvertVoltageToDistance(double voltage);
 
 #endif /* MYSRC_SHARP_MANAGER_H */
