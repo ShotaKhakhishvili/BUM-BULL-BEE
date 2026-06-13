@@ -438,8 +438,12 @@ bool Vl53l0x_Init(Vl53l0x *self)
     /* Disable SIGNAL_RATE_MSRC and SIGNAL_RATE_PRE_RANGE limit checks */
     writeReg(MSRC_CONFIG_CONTROL, readReg(MSRC_CONFIG_CONTROL) | 0x12);
 
-    /* Set final range signal rate limit to 0.25 MCPS (million counts/sec) */
-    setSignalRateLimit(0.25f);
+    /* Final-range signal-rate limit. We only need to range <= ~100 cm, where
+     * the real target return is strong, so raise the floor from the 0.25 MCPS
+     * default to 0.50 MCPS. This rejects weak / noisy returns (ambient light,
+     * crosstalk, faint far echoes) and keeps only high-confidence samples -
+     * trading the long-range reach we don't want for cleaner near/mid readings. */
+    setSignalRateLimit(0.50f);
 
     writeReg(SYSTEM_SEQUENCE_CONFIG, 0xFF);
 
@@ -567,7 +571,11 @@ bool Vl53l0x_Init(Vl53l0x *self)
     /* Disable MSRC and TCC by default (ST reduced API default) */
     writeReg(SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
-    /* Recalculate timing budget after the sequence config change */
+    /* High-accuracy profile: since we only care about <= ~100 cm, spend the
+     * extra integration time on noise reduction rather than range. A ~50 ms
+     * budget (~20 Hz) gives noticeably tighter readings than the ~33 ms
+     * default and is still far faster than the control loop needs. */
+    self->measurement_timing_budget_us = 50000;
     setMeasurementTimingBudget(self, self->measurement_timing_budget_us);
 
     /* --- VHV / phase reference calibration --- */
