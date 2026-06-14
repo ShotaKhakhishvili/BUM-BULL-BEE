@@ -77,9 +77,6 @@ static Light g_bl;
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
-/* Robot run state driven by the PB8 remote line (EXTI): 1 = on, 0 = off. */
-static volatile bool g_robot_on = false;
-
 static Light *g_lights[4] =
 {
   &g_fr,
@@ -169,9 +166,6 @@ int main(void)
   Seek_SetTuning(&g_seek, &g_seek_tuning);
   WS2812B_Init();
 
-  /* Seed the run state from the current PA8 level; the EXTI keeps it updated. */
-  g_robot_on = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_SET);
-
   {
     uint32_t i;
 
@@ -187,90 +181,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    int middle_raw_adc;
-    int left_raw_adc;
-    int right_raw_adc;
-    double middle_voltage;
-    double left_voltage;
-    double right_voltage;
-    double tof_cm;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-    if (!g_robot_on)
-    {
-      Move_Stop(&move);
-      Move_Update(&move);
-      g_seek_mode = SEEK_MODE_LOOK;
-      HAL_Delay(5);
-      continue;
-    }
+    /* Drive forward for 2 s, then backward for 1 s, and repeat. */
+    Move_Walk(&move, MOVE_FORWARD, 200);
+    HAL_Delay(2000);
 
-    /* WS2812B heartbeat blink */
-    {
-      static uint32_t s_led_last = 0U;
-      static bool     s_led_on = false;
-      uint32_t now = HAL_GetTick();
-
-      if ((now - s_led_last) >= 500U)
-      {
-        s_led_last = now;
-        s_led_on = !s_led_on;
-        WS2812B_SetColor(0, s_led_on ? 255U : 0U, 0U, 0U);
-        WS2812B_Send();
-      }
-    }
-
-    SharpManager_Update(&g_sharp_manager);
-    Vl53l0x_Update(&g_tof);
-    ForwardRange_Update(&g_forward);
-    CloseIR_Update(&g_close_ir);
-
-    middle_raw_adc = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_MIDDLE);
-    left_raw_adc   = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_LEFT);
-    right_raw_adc  = SharpManager_GetRawAdc(&g_sharp_manager, SHARP_SENSOR_RIGHT);
-
-    middle_voltage = SharpManager_AdcToVoltage(middle_raw_adc, 3.3, 4095.0);
-    left_voltage   = SharpManager_AdcToVoltage(left_raw_adc,   3.3, 4095.0);
-    right_voltage  = SharpManager_AdcToVoltage(right_raw_adc,  3.3, 4095.0);
-
-    tof_cm = Vl53l0x_GetDistanceCm(&g_tof);
-
-    /* The old short-Sharp debug slots now carry ToF telemetry. */
-    g_debug_short_raw_adc = (int32_t)Vl53l0x_GetDistanceMm(&g_tof);
-    g_debug_long_raw_adc  = middle_raw_adc;
-    g_debug_left_raw_adc  = left_raw_adc;
-    g_debug_right_raw_adc = right_raw_adc;
-    g_debug_short_voltage = (float)tof_cm;
-    g_debug_long_voltage  = (float)middle_voltage;
-    g_debug_left_voltage  = (float)left_voltage;
-    g_debug_right_voltage = (float)right_voltage;
-
-    MedianCalculator_Update(
-        &g_median_calculator,
-        tof_cm,
-        middle_voltage);
-
-    if ((g_seek_mode == SEEK_MODE_LOOK) && Seek_IsTargetVisible(&g_seek))
-    {
-      g_seek_mode = SEEK_MODE_CHASE;
-    }
-    else if ((g_seek_mode == SEEK_MODE_CHASE) && !Seek_IsTargetVisible(&g_seek))
-    {
-      g_seek_mode = SEEK_MODE_LOOK;
-    }
-
-    if (ForwardRange_GetDistanceCm(&g_forward) < 30 && !Seek_IsTargetVisible(&g_seek))
-    {
-      g_seek_mode = SEEK_MODE_LOOK;
-    }
-
-    Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
-
-    Move_Update(&move);
-
-    HAL_Delay(5);
+    Move_Walk(&move, MOVE_BACKWARD, 200);
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -373,19 +293,6 @@ static void App_InitParityGpio(void)
   gpio.Mode = GPIO_MODE_INPUT;
   gpio.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &gpio);
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if (GPIO_Pin == GPIO_PIN_8)
-  {
-    g_robot_on = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_SET);
-
-    if (!g_robot_on)
-    {
-      g_seek_mode = SEEK_MODE_LOOK;
-    }
-  }
 }
 
 /* USER CODE END 4 */
