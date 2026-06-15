@@ -1,20 +1,10 @@
-02:22:18 **** Incremental Build of configuration Debug for project 4wheel ****
+04:54:05 **** Incremental Build of configuration Debug for project 4wheel ****
 make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:328:13: warning: 'MX_USART1_UART_Init' defined but not used [-Wunused-function]
-  328 | static void MX_USART1_UART_Init(void)
-      |             ^~~~~~~~~~~~~~~~~~~
-arm-none-eabi-gcc -o "4wheel.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\MESS\projects\ROBOTICS\BUM-BULL-BEE\cubeide\4wheel\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="4wheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: 4wheel.elf
- 
 arm-none-eabi-size  4wheel.elf 
-arm-none-eabi-objdump -h -S 4wheel.elf  > "4wheel.list"
    text	   data	    bss	    dec	    hex	filename
-  33004	    112	   4448	  37564	   92bc	4wheel.elf
+  27400	     28	   4000	  31428	   7ac4	4wheel.elf
 Finished building: default.size.stdout
  
-Finished building: 4wheel.list
- 
 
-02:22:18 Build Finished. 0 errors, 1 warnings. (took 806ms)
+04:54:05 Build Finished. 0 errors, 0 warnings. (took 315ms)
 
