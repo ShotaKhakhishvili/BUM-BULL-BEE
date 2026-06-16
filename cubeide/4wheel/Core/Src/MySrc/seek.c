@@ -119,6 +119,13 @@ static void Seek_MoveWithSteer(
         return;
     }
 
+    /* Balanced / no side bias -> drive straight rather than a left-biased slide. */
+    if (direction == SEEK_STEER_STRAIGHT)
+    {
+        Move_Walk(move, MOVE_FORWARD, Seek_ClampSpeed(speed));
+        return;
+    }
+
     finalDirection = ROT_LEFT;
 
     if(direction == SEEK_STEER_RIGHT)
@@ -245,9 +252,11 @@ void Seek_Update(
     left_voltage = SharpManager_AdcToVoltage(left_raw_adc, 3.3, 4095.0);
     right_voltage = SharpManager_AdcToVoltage(right_raw_adc, 3.3, 4095.0);
 
-    /* Middle uses the combiner's own validity instead of the Sharp voltage gate. */
+    /* Middle uses the combiner's own validity instead of the Sharp voltage gate.
+     * A value of 0 means "too close to measure" (point-blank dead ahead), which
+     * must still count as seen - otherwise the bot abandons a target at contact. */
     sees_middle = ForwardRange_IsValid(forward) &&
-                  (middle_cm > 0.0) &&
+                  (middle_cm >= 0.0) &&
                   (middle_cm <= self->tuning.see_threshold_cm);
     sees_left = Seek_IsSeen(left_cm, self->tuning.see_threshold_cm, left_voltage);
     sees_right = Seek_IsSeen(right_cm, self->tuning.see_threshold_cm, right_voltage);

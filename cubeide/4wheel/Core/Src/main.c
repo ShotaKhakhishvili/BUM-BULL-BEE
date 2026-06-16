@@ -63,7 +63,7 @@
 #define SENSOR_TEST_TOF         3   /* VL53L0X time-of-flight via Vl53l0x lib (I2C2) */
 
 #ifndef SENSOR_TEST_SELECT
-#define SENSOR_TEST_SELECT      SENSOR_TEST_TOF
+#define SENSOR_TEST_SELECT      SENSOR_TEST_NONE
 #endif
 
 /* USER CODE END PD */
@@ -211,12 +211,25 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    /* Drive forward for 2 s, then backward for 1 s, and repeat. */
-    Move_Walk(&move, MOVE_FORWARD, 200);
-    HAL_Delay(2000);
+    SharpManager_Update(&g_sharp_manager);
+    Vl53l0x_Update(&g_tof);
+    CloseIR_Update(&g_close_ir);
 
-    Move_Walk(&move, MOVE_BACKWARD, 200);
-    HAL_Delay(1000);
+    ForwardRange_Update(&g_forward);
+
+    if (Seek_IsTargetVisible(&g_seek))
+    {
+      g_seek_mode = CloseIR_SeesObject(&g_close_ir) ? SEEK_MODE_CATCH : SEEK_MODE_CHASE;
+    }
+    else
+    {
+      g_seek_mode = SEEK_MODE_LOOK;
+    }
+
+    Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
+    Move_Update(&move);
+
+    HAL_Delay(5);
   }
   /* USER CODE END 3 */
 }
