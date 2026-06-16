@@ -49,6 +49,23 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+/* ===========================================================================
+ *  SENSOR BENCH TESTS
+ *  ---------------------------------------------------------------------------
+ *  Only ONE test runs at a time. Set SENSOR_TEST_SELECT below, rebuild, flash.
+ *  When a test is selected it runs forever and the normal robot logic (motors,
+ *  ADC, etc.) never starts -- so the bot stays still on the bench.
+ *  Set it back to SENSOR_TEST_NONE to build the real robot firmware again.
+ * ===========================================================================*/
+#define SENSOR_TEST_NONE        0
+#define SENSOR_TEST_START_STOP  1   /* start_stop module on PA8 */
+#define SENSOR_TEST_SHARP_IR    2   /* Sharp long IR x3 via SharpManager + ADC/DMA */
+#define SENSOR_TEST_TOF         3   /* VL53L0X time-of-flight via Vl53l0x lib (I2C2) */
+
+#ifndef SENSOR_TEST_SELECT
+#define SENSOR_TEST_SELECT      SENSOR_TEST_TOF
+#endif
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -100,6 +117,9 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
+#if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
+static void SensorTest_Run(void);
+#endif
 
 /* USER CODE END PFP */
 
@@ -143,6 +163,13 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+#if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
+  /* Bench test mode: run the selected sensor test forever. Each test brings up
+   * only the peripherals it needs. The motor startup below is intentionally
+   * skipped so the bot stays still on the bench. */
+  SensorTest_Run();   /* never returns */
+#endif
+
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
   {
     Error_Handler();
@@ -241,6 +268,146 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+#if SENSOR_TEST_SELECT == SENSOR_TEST_START_STOP
+/*
+ * start_stop module test (PA8).
+ *   PA8 == 1  -> WS2812B LED red
+ *   PA8 == 0  -> WS2812B LED blue
+ * The signal is driven by another MCU (push-pull), so PA8 stays NOPULL.
+ * PA8 is already configured as an input by MX_GPIO_Init(), so reading its level
+ * works as-is. We only refresh the LED when the level changes to avoid hammering
+ * the DMA every loop. Adjust LED_BRIGHTNESS (0..255) to taste.
+ */
+#define LED_BRIGHTNESS  120U
+
+static void SensorTest_Run(void)
+{
+  GPIO_PinState last = (GPIO_PinState)2;  /* force a refresh on first pass */
+
+  WS2812B_Init();
+
+  for (;;)
+  {
+    GPIO_PinState now = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
+
+    if (now != last)
+    {
+      if (now == GPIO_PIN_SET)
+      {
+        WS2812B_SetColor(0U, LED_BRIGHTNESS, 0U, 0U);   /* PA8 = 1 -> red  */
+      }
+      else
+      {
+        WS2812B_SetColor(0U, 0U, 0U, LED_BRIGHTNESS);   /* PA8 = 0 -> blue */
+      }
+      WS2812B_Send();
+      last = now;
+    }
+
+    HAL_Delay(10);   /* ~100 Hz poll, plenty for a start/stop signal */
+  }
+}
+#endif /* SENSOR_TEST_START_STOP */
+
+#if SENSOR_TEST_SELECT == SENSOR_TEST_SHARP_IR
+/*
+ * Sharp long-range IR test (3 sensors) using the existing SharpManager library
+ * UNCHANGED. The Sharps are read through the ADC -> DMA buffer (adc_raw), so we
+ * start the ADC scan here, then just call SharpManager_Update() in a loop.
+ *
+ * Watch these in the CubeIDE "Live Expressions" window (index 0=LEFT, 1=MIDDLE,
+ * 2=RIGHT, matching the SharpSensor enum):
+ *
+ *     sharp_raw_adc      raw 12-bit ADC counts (0..4095)
+ *     sharp_voltage      that ADC converted to volts (0..3.3)
+ *     sharp_raw_cm       distance from the library, UNFILTERED
+ *     sharp_dist_cm      distance from the library, EMA-FILTERED (what the robot uses)
+ *     sharp_loop_count   increments every loop, so you can see it's alive
+ *
+ * Not static / not optimized away, so the debugger can always see them.
+ */
+volatile int    sharp_raw_adc[SHARP_SENSOR_COUNT];
+volatile double sharp_voltage[SHARP_SENSOR_COUNT];
+volatile double sharp_raw_cm[SHARP_SENSOR_COUNT];
+volatile double sharp_dist_cm[SHARP_SENSOR_COUNT];
+volatile uint32_t sharp_loop_count;
+
+static SharpManager s_sharp_test;
+
+static void SensorTest_Run(void)
+{
+  /* Start the ADC scan into adc_raw[] (DMA, circular). SharpManager reads from it
+   * via the platform adapter. NOTE: length here matches the current adc_raw[]
+   * size; see the warning I gave you about the ADC channel-count mismatch. */
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  SharpManager_Init(&s_sharp_test);
+
+  for (;;)
+  {
+    SharpManager_Update(&s_sharp_test);
+
+    for (int i = 0; i < SHARP_SENSOR_COUNT; ++i)
+    {
+      sharp_raw_adc[i] = SharpManager_GetRawAdc(&s_sharp_test, (SharpSensor)i);
+      sharp_voltage[i] = SharpManager_AdcToVoltage(sharp_raw_adc[i], 3.3, 4095.0);
+      sharp_raw_cm[i]  = SharpManager_GetRawDistance(&s_sharp_test, (SharpSensor)i);
+      sharp_dist_cm[i] = SharpManager_GetDistance(&s_sharp_test, (SharpSensor)i);
+    }
+
+    sharp_loop_count++;
+    HAL_Delay(5);
+  }
+}
+#endif /* SENSOR_TEST_SHARP_IR */
+
+#if SENSOR_TEST_SELECT == SENSOR_TEST_TOF
+/*
+ * VL53L0X time-of-flight test using the existing Vl53l0x library UNCHANGED.
+ * Runs on I2C2 (already brought up by MX_I2C2_Init() before this is called).
+ * Vl53l0x_Init() boots the sensor and starts continuous ranging; we then poll
+ * Vl53l0x_Update() in the loop.
+ *
+ * Watch these in Live Expressions:
+ *
+ *     tof_init_ok      1 = sensor answered and init succeeded, 0 = no/wrong device
+ *     tof_valid        1 = current reading is in range, 0 = out of range / no target
+ *     tof_distance_mm  latest range in millimetres
+ *     tof_distance_cm  latest range in centimetres
+ *     tof_loop_count   increments every loop, so you can see it's alive
+ *
+ * If tof_init_ok stays 0 -> I2C wiring / address / power problem (the loop will
+ * still run, but distances stay 0).
+ */
+volatile uint8_t  tof_init_ok;
+volatile uint8_t  tof_valid;
+volatile uint16_t tof_distance_mm;
+volatile double   tof_distance_cm;
+volatile uint32_t tof_loop_count;
+
+static Vl53l0x s_tof_test;
+
+static void SensorTest_Run(void)
+{
+  tof_init_ok = (uint8_t)Vl53l0x_Init(&s_tof_test);
+
+  for (;;)
+  {
+    Vl53l0x_Update(&s_tof_test);
+
+    tof_valid       = (uint8_t)Vl53l0x_IsValid(&s_tof_test);
+    tof_distance_mm = Vl53l0x_GetDistanceMm(&s_tof_test);
+    tof_distance_cm = Vl53l0x_GetDistanceCm(&s_tof_test);
+
+    tof_loop_count++;
+    HAL_Delay(5);
+  }
+}
+#endif /* SENSOR_TEST_TOF */
 
 static void MX_USART1_UART_Init(void)
 {
