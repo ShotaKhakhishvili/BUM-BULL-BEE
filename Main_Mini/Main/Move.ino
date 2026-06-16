@@ -1,5 +1,11 @@
 #include "Move.hpp"
 
+void Move::Init()
+{
+  L.Init();
+  R.Init();
+}
+
 void Move::RotateOnPoint(bool dir, int str)
 {
   L.setRotation(dir, str);

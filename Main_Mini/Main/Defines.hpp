@@ -12,17 +12,20 @@
 
 // ------------------- DISTANCE SENSORS ----------------------
 
-#define IR              A0
-#define INFRARED_L      A1
-#define INFRARED_M      A2
-#define INFRARED_R      A3
+#define SHARP_PIN       A3      // Sharp GP2Y0A21 analog out
+
+#define IR1             7       // D7 - digital IR sensor
+#define IR2             8       // D8 - digital IR sensor
+
+// Logic level a digital IR module outputs when it sees a target.
+// Flip to HIGH if your modules are active-high.
+#define IR_DETECTED     LOW
 
 #define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 #define SHARP_UPDATE_INTERVAL 40
 #define SHARP_SMOOTHING_ALPHA 0.3   // EMA weight: higher = snappier, lower = smoother
-#define INFRARED_UPDATE_INTERVAL 40
 
-// VL53L0X Time-of-Flight (I2C: SDA = A4, SCL = A5 on the Uno)
+// VL53L0X Time-of-Flight (I2C: SDA = A4, SCL = A5)
 #define TOF_UPDATE_INTERVAL 40
 
 // Sharp <-> ToF handoff (hysteresis band, cm). The gap between the two
@@ -30,15 +33,17 @@
 #define TOF_SWITCH_DISTANCE     13.0   // on Sharp & closer than this -> ToF
 #define SHARP_SWITCH_DISTANCE   16.0   // on ToF   & farther than this -> Sharp
 
-#define INFRARED_MAX_ADC      1023.0   // full-scale ADC count
-#define INFRARED_MAX_DISTANCE 5.0      // cm when ADC reads 0 (sensor at full voltage)
+// -------------------- MOTOR DRIVER (TB6612FNG) -------------
+// Each motor: one PWM (speed) pin + two direction pins.
+// NOTE: STBY must be tied HIGH (to VCC) to enable the driver.
 
-// -------------------- WHEELS -------------------------------
+#define PWMA          3     // D3  - Motor A speed (PWM)
+#define AIN1          12    // D12 - Motor A direction
+#define AIN2          4     // D4  - Motor A direction
 
-#define WH_RB         6 
-#define WH_RF         7 
-#define WH_LF         8 
-#define WH_LB         9 
+#define PWMB          9     // D9  - Motor B speed (PWM)
+#define BIN1          A2    // Motor B direction
+#define BIN2          A1    // Motor B direction
 
 // -------------------- OTHERS -------------------------------
 

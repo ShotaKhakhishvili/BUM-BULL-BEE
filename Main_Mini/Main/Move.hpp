@@ -4,8 +4,12 @@
 
 namespace Move
 {
-  static Wheel L(WH_LF, WH_LB);
-  static Wheel R(WH_RF, WH_RB);
+  // Motor A -> Left, Motor B -> Right.
+  // Swap these two lines (or the motor wiring) if the bot drives mirrored.
+  static Wheel L(PWMA, AIN1, AIN2);
+  static Wheel R(PWMB, BIN1, BIN2);
+
+  void Init();
 
   void RotateOnPoint(bool dir, int str);
 

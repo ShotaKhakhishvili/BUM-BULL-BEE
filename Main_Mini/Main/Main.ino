@@ -1,13 +1,13 @@
 #include "Defines.hpp"
-#include "Distance.hpp"
 #include "SharpMedian.hpp"
 #include "Range.hpp"
+#include "Infrared.hpp"
 
 #include "Move.hpp"
 #include "Behavior.hpp"
 
 Range range;
-Infrared infraL, infraR;
+Infrared ir1, ir2;
 
 void setup()
 {
@@ -15,21 +15,11 @@ void setup()
 
     pinMode(LED, OUTPUT);
 
-    pinMode(WH_LF, OUTPUT);
-    pinMode(WH_LB, OUTPUT);
-    pinMode(WH_RF, OUTPUT);
-    pinMode(WH_RB, OUTPUT);
+    Move::Init();           // TB6612FNG motor pins
 
-    pinMode(RESET, INPUT);
-
-    pinMode(IR, INPUT);
-    pinMode(INFRARED_L, INPUT);
-    pinMode(INFRARED_M, INPUT);
-    pinMode(INFRARED_R, INPUT);
-
-    range.Init();
-    infraL.Init(INFRARED_L);
-    infraR.Init(INFRARED_R);
+    range.Init();           // Sharp (A3) + ToF (I2C: A4/A5)
+    ir1.Init(IR1);          // D7
+    ir2.Init(IR2);          // D8
 }
 
 void loop()
@@ -40,4 +30,6 @@ void loop()
 
     Behavior::DebugPrint();
     range.DebugPrint();
+    ir1.DebugPrint();
+    ir2.DebugPrint();
 }

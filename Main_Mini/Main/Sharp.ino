@@ -83,7 +83,7 @@ double Sharp::Distance()
 
     if(now >= SHARP_UPDATE_INTERVAL + lastUpdateTime)
     {
-        this->rawAdc = analogRead(IR);
+        this->rawAdc = analogRead(SHARP_PIN);
         this->volt = AdcToVoltage(rawAdc);
 
         SharpMedian::Update(volt);

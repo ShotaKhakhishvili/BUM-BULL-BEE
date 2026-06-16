@@ -4,36 +4,30 @@
 void Infrared::Init(int pin)
 {
     this->pin = pin;
+    pinMode(pin, INPUT);
 
-    lastUpdateTime = -INFRARED_UPDATE_INTERVAL;
-
-    Distance();
+    Detected();
 }
 
-double Infrared::Distance()
+bool Infrared::Detected()
 {
-    const unsigned long now = millis();
+    level = digitalRead(pin);
+    return level == IR_DETECTED;
+}
 
-    if (now >= INFRARED_UPDATE_INTERVAL + lastUpdateTime)
-    {
-        this->rawAdc = analogRead(this->pin);
-        this->volt = AdcToVoltage(rawAdc);
-        this->distance = ((INFRARED_MAX_ADC - rawAdc) / INFRARED_MAX_ADC) * INFRARED_MAX_DISTANCE;
-
-        lastUpdateTime = now;
-    }
-
-    return distance;
+int Infrared::Raw()
+{
+    return level;
 }
 
 void Infrared::DebugPrint()
 {
-    this->Distance();
-    
-    Serial.print("Infrared Data : | Raw Adc: ");
-    Serial.print(rawAdc);
-    Serial.print(" | Voltage: ");
-    Serial.print(volt, kPrintDigitsAfterDecimal);
-    Serial.print(" | Distance: ");
-    Serial.println(distance, kPrintDigitsAfterDecimal);
+    this->Detected();
+
+    Serial.print("IR (pin ");
+    Serial.print(pin);
+    Serial.print(") : | Level: ");
+    Serial.print(level);
+    Serial.print(" | Detected: ");
+    Serial.println(Detected() ? "YES" : "no");
 }
