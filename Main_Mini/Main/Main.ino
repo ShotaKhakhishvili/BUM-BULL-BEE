@@ -1,13 +1,13 @@
 #include "Defines.hpp"
 #include "Distance.hpp"
 #include "SharpMedian.hpp"
-#include "Tof.hpp"
+#include "Range.hpp"
 
 #include "Move.hpp"
+#include "Behavior.hpp"
 
-Distance distance;
+Range range;
 Infrared infraL, infraR;
-Tof tof;
 
 void setup()
 {
@@ -27,32 +27,17 @@ void setup()
     pinMode(INFRARED_M, INPUT);
     pinMode(INFRARED_R, INPUT);
 
-    distance.Init();
+    range.Init();
     infraL.Init(INFRARED_L);
     infraR.Init(INFRARED_R);
-    tof.Init();
 }
 
 void loop()
 {
-    distance.DebugPrint(0b11);
-    infraL.DebugPrint();
-    infraR.DebugPrint();
-    tof.DebugPrint();
+    double front = range.Distance();
 
-    /*
+    Behavior::Update(front);
 
-    distance.GetSharp();
-
-    if (SharpMedian::Count() >= SharpMedian::SAMPLE_SIZE)
-    {
-        Serial.print("Sharp | Median Voltage: ");
-        Serial.println(SharpMedian::GetMedianVoltage(), kPrintDigitsAfterDecimal);
-
-        SharpMedian::Reset();
-    }
-
-    */
-
-    delay(500);
+    Behavior::DebugPrint();
+    range.DebugPrint();
 }

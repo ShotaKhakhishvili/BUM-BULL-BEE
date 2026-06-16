@@ -10,16 +10,19 @@
  * Forward-distance combiner.
  *
  * Switches between the VL53L0X time-of-flight sensor (near field, ~2-20 cm) and
- * the long Sharp IR sensor (useful out to ~150 cm) at a 15 cm crossover: the ToF
- * is used below 15 cm and the Sharp at/above it. The result is the single
- * forward distance consumed by Seek's middle channel and the collision check.
+ * the long Sharp IR sensor (useful out to ~150 cm) with hysteresis: while on the
+ * Sharp it drops to the ToF once the distance falls below 13 cm, and while on the
+ * ToF it climbs back to the Sharp once the distance rises above 16 cm. The 3 cm
+ * dead-band stops chatter near the crossover. The result is the single forward
+ * distance consumed by Seek's middle channel and the collision check.
  */
 typedef struct
 {
     Vl53l0x *tof;                 /* time-of-flight sensor (primary) */
     const SharpManager *sharp;    /* Sharp half = long forward IR sensor */
-    double fused_cm;              /* last fused forward distance (cm) */
+    double fused_cm;              /* last selected forward distance (cm) */
     bool valid;                   /* true when fused_cm reflects a fresh reading */
+    bool using_tof;               /* hysteresis state: true = ToF active, false = Sharp */
 } ForwardRange;
 
 void ForwardRange_Init(ForwardRange *self, Vl53l0x *tof, const SharpManager *sharp);

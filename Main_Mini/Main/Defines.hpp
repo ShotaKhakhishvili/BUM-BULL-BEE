@@ -25,6 +25,11 @@
 // VL53L0X Time-of-Flight (I2C: SDA = A4, SCL = A5 on the Uno)
 #define TOF_UPDATE_INTERVAL 40
 
+// Sharp <-> ToF handoff (hysteresis band, cm). The gap between the two
+// thresholds stops the source from flapping around a single distance.
+#define TOF_SWITCH_DISTANCE     13.0   // on Sharp & closer than this -> ToF
+#define SHARP_SWITCH_DISTANCE   16.0   // on ToF   & farther than this -> Sharp
+
 #define INFRARED_MAX_ADC      1023.0   // full-scale ADC count
 #define INFRARED_MAX_DISTANCE 5.0      // cm when ADC reads 0 (sensor at full voltage)
 
@@ -54,4 +59,14 @@
 #define MAX_DISTANCE  65
 #define LIGHT_REFRESH 15L
 #define WHITE_LIMIT   25L
+
+// -------------------- BEHAVIOR -----------------------------
+
+#define DETECT_DISTANCE   60.0
+#define LOSE_DISTANCE     70.0
+
+#define SEEK_SPEED        120   
+#define CHASE_SPEED       190  
+
+#define SEEK_DIR          RIGHT
 

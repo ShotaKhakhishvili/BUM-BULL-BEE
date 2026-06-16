@@ -2,5 +2,5 @@
 
 double AdcToVoltage(int adc)
 {
-    return (adc / 2048.0) * 5.0;
+    return (adc / 1024.0) * 5.0;
 }
