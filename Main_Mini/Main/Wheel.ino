@@ -32,4 +32,11 @@ void Wheel::setRotation(bool dir, int str)
   }
   analogWrite(pwm, str);
   this->dir = dir;
+
+  Serial.print("Motor (PWM pin ");
+  Serial.print(pwm);
+  Serial.print(") | Dir: ");
+  Serial.print(dir ? "FWD" : "BWD");
+  Serial.print(" | Speed: ");
+  Serial.println(str);
 }

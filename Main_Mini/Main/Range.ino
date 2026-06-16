@@ -39,6 +39,9 @@ void Range::DebugPrint()
 {
     this->Distance();
 
+    sharp.DebugPrint();
+    tof.DebugPrint();
+
     Serial.print("Range | Source: ");
     Serial.print(usingTof ? "ToF  " : "Sharp");
     Serial.print(" | Distance: ");
