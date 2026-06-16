@@ -8,7 +8,7 @@
 
 Range range;
 Infrared ir1, ir2;
-int lastDebugPrint = -1000;
+unsigned long lastDebugPrint = 0;
 
 void setup()
 {
@@ -29,7 +29,7 @@ void loop()
 
     Behavior::Update(front);
 
-    if(lastDebugPrint - millis() > 1000)
+    if(millis() - lastDebugPrint >= 1000)
     {
         Behavior::DebugPrint();
         range.DebugPrint();
