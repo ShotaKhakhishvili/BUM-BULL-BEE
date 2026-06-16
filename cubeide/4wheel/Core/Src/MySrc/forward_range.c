@@ -5,7 +5,7 @@
  * near field and the Sharp owns everything beyond. The crossover is at
  * FR_CROSSOVER_CM (15 cm):
  *
- *   - range < 15 cm: use the ToF. Below FR_TOF_MIN_CM (~4 cm) it is too close
+ *   - range < 15 cm: use the ToF. Below FR_TOF_MIN_CM (~2 cm) it is too close
  *     for either sensor, so we report 0 ("too close to measure") rather than a
  *     misleading number.
  *   - range >= 15 cm (or the ToF is out of its short range / invalid): the Sharp
@@ -14,7 +14,7 @@
  * If the chosen sensor is unusable we fall back to the other one; if neither is
  * usable we hold the last value and clear valid.
  */
-#define FR_TOF_MIN_CM           4.0   /* below this the ToF can't be trusted -> report 0 */
+#define FR_TOF_MIN_CM           2.0   /* below this the ToF can't be trusted -> report 0 */
 #define FR_SHARP_MIN_CM         8.0   /* Sharp is monotonic at/above this (near fold-back below) */
 #define FR_CROSSOVER_CM        15.0   /* < this -> ToF; >= this -> Sharp */
 #define FR_SHARP_VALID_VOLT     0.5   /* mirrors Seek_IsSeen's middle-voltage gate */
