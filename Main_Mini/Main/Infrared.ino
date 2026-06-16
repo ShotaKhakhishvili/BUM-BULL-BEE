@@ -28,6 +28,6 @@ void Infrared::DebugPrint()
     Serial.print(pin);
     Serial.print(") : | Level: ");
     Serial.print(level);
-    Serial.print(" | Detected: ");
-    Serial.println(Detected() ? "YES" : "no");
+    Serial.print(" | ");
+    Serial.println(Detected() ? "LINE" : "NOLINE");
 }
