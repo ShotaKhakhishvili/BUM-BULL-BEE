@@ -19,7 +19,7 @@
 #define FR_SHARP_MIN_CM         8.0   /* Sharp is monotonic at/above this (near fold-back below) */
 #define FR_SWITCH_TO_TOF_CM    13.0   /* on Sharp: drop to ToF below this */
 #define FR_SWITCH_TO_SHARP_CM  16.0   /* on ToF: climb to Sharp above this */
-#define FR_SHARP_VALID_VOLT     0.5   /* mirrors Seek_IsSeen's middle-voltage gate */
+#define FR_SHARP_VALID_VOLT    0.43   /* mirrors Seek's SEEK_SEE_MIN_VOLT (see ~60 cm) */
 #define FR_SHARP_MAX_CM       150.0   /* Sharp practical reach */
 
 static bool ForwardRange_SharpValid(const SharpManager *sharp, double sharp_cm)

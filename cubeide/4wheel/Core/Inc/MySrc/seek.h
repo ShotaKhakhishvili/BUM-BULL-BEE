@@ -34,7 +34,7 @@ typedef struct
 
 #define SEEK_TUNING_DEFAULT_INITIALIZER \
     {                                   \
-        65.0,                           \
+        60.0,                           \
         1.0,                            \
         150,                            \
         150,                            \

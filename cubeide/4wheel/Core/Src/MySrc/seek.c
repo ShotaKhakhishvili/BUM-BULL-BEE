@@ -6,6 +6,11 @@
 #define SEEK_AGGRESSIVE_TURN_COEF_THRESHOLD 0.20f
 #define SEEK_AGGRESSIVE_INNER_REVERSE_COEF 0.55f
 
+/* Validity floor for the side Sharps. The long Sharp reads ~0.44 V at 60 cm, so
+ * this must sit below that or targets near the 60 cm see_threshold get clipped
+ * before the distance check. It only rejects genuine no-signal/noise now. */
+#define SEEK_SEE_MIN_VOLT 0.43
+
 static int Seek_MaxInt(int a, int b)
 {
     return (a > b) ? a : b;
@@ -57,7 +62,7 @@ static int Seek_ScaleSpeedByCoef(int speed, float coef)
 
 static bool Seek_IsSeen(double distance_cm, double threshold_cm, double volt)
 {
-	if(volt <= 0.5)
+	if(volt <= SEEK_SEE_MIN_VOLT)
 		return false;
 
     return (distance_cm > 0.0) && (distance_cm <= threshold_cm);
