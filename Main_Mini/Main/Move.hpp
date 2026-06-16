@@ -11,6 +11,8 @@ namespace Move
 
   void Init();
 
+  void DebugPrint();
+
   void RotateOnPoint(bool dir, int str);
 
   void RotateOnSide(bool dir, int str);

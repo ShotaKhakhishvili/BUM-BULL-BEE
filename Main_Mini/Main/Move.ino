@@ -6,6 +6,14 @@ void Move::Init()
   R.Init();
 }
 
+void Move::DebugPrint()
+{
+  Serial.print("Left  ");
+  L.DebugPrint();
+  Serial.print("Right ");
+  R.DebugPrint();
+}
+
 void Move::RotateOnPoint(bool dir, int str)
 {
   L.setRotation(dir, str);

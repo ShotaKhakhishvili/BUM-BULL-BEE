@@ -32,6 +32,7 @@ void loop()
     if(millis() - lastDebugPrint >= 1000)
     {
         Behavior::DebugPrint();
+        Move::DebugPrint();
         range.DebugPrint();
         ir1.DebugPrint();
         ir2.DebugPrint();

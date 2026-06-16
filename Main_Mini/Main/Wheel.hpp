@@ -6,6 +6,7 @@ class Wheel
 {
 private:
   bool dir = false;
+  int str = 0;                          // last commanded speed
   int pwm, in1, in2;
 
 public:
@@ -14,4 +15,5 @@ public:
 
   void Init();                          // set pin modes
   void setRotation(bool dir, int str);
+  void DebugPrint();                    // print last commanded state
 };
