@@ -9,9 +9,9 @@
 /*
  * Forward-distance combiner.
  *
- * Fuses the VL53L0X time-of-flight sensor (primary, accurate ~2-120 cm) with
- * the long Sharp IR sensor (fallback / cross-check, useful out to ~150 cm).
- * The fused result replaces the old short+long Sharp mode-switch as the single
+ * Switches between the VL53L0X time-of-flight sensor (near field, ~2-20 cm) and
+ * the long Sharp IR sensor (useful out to ~150 cm) at a 15 cm crossover: the ToF
+ * is used below 15 cm and the Sharp at/above it. The result is the single
  * forward distance consumed by Seek's middle channel and the collision check.
  */
 typedef struct

@@ -1,27 +1,22 @@
 #include "MySrc/forward_range.h"
 
 /*
- * Fusion policy: the ToF is the primary validator, and the fused distance is
- * decided in three bands keyed off the ToF reading:
+ * Switching policy (no blending): the ToF only ranges to ~20 cm, so it owns the
+ * near field and the Sharp owns everything beyond. The crossover is at
+ * FR_CROSSOVER_CM (15 cm):
  *
- *   - tof_cm <  FR_TOF_MIN_CM (~4 cm): point-blank. Neither sensor can range
- *     this reliably (the ToF is below its usable floor and the Sharp folds back
- *     in the near field), so we report 0 - "too close to measure" - rather than
- *     a misleading number.
- *   - FR_TOF_MIN_CM <= tof_cm < FR_SHARP_MIN_CM (~8 cm): the ToF is trusted on
- *     its own; the Sharp is still in its non-monotonic near zone, so it is not
- *     considered yet.
- *   - FR_SHARP_MIN_CM <= tof_cm <= FR_TOF_TRUST_MAX_CM: both are in their good
- *     ranges. If the Sharp agrees within AGREE_TOL_CM the two are averaged
- *     (smoother), otherwise the ToF wins.
- *   - tof_cm > FR_TOF_TRUST_MAX_CM, or the ToF is invalid/blocked: fall back to
- *     the Sharp (far range). If the Sharp is also unusable, hold the last value
- *     and clear valid.
+ *   - range < 15 cm: use the ToF. Below FR_TOF_MIN_CM (~4 cm) it is too close
+ *     for either sensor, so we report 0 ("too close to measure") rather than a
+ *     misleading number.
+ *   - range >= 15 cm (or the ToF is out of its short range / invalid): the Sharp
+ *     reading is the final result.
+ *
+ * If the chosen sensor is unusable we fall back to the other one; if neither is
+ * usable we hold the last value and clear valid.
  */
 #define FR_TOF_MIN_CM           4.0   /* below this the ToF can't be trusted -> report 0 */
-#define FR_SHARP_MIN_CM         8.0   /* Sharp joins the decision at/above this (monotonic floor) */
-#define FR_TOF_TRUST_MAX_CM   120.0   /* ToF gets noisy / saturates beyond this */
-#define FR_AGREE_TOL_CM        15.0   /* ToF & Sharp "agree" within this many cm */
+#define FR_SHARP_MIN_CM         8.0   /* Sharp is monotonic at/above this (near fold-back below) */
+#define FR_CROSSOVER_CM        15.0   /* < this -> ToF; >= this -> Sharp */
 #define FR_SHARP_VALID_VOLT     0.5   /* mirrors Seek_IsSeen's middle-voltage gate */
 #define FR_SHARP_MAX_CM       150.0   /* Sharp practical reach */
 
@@ -79,57 +74,27 @@ void ForwardRange_Update(ForwardRange *self)
     sharp_cm = SharpManager_GetDistance(self->sharp, SHARP_SENSOR_MIDDLE);
     sharp_ok = ForwardRange_SharpValid(self->sharp, sharp_cm);
 
-    /* The ToF is the primary validator. */
-    if (tof_ok)
+    /* Near field (< 15 cm): the ToF owns it. */
+    if (tof_ok && (tof_cm < FR_CROSSOVER_CM))
     {
         /* Point-blank: too close for either sensor -> report 0. */
-        if (tof_cm < FR_TOF_MIN_CM)
-        {
-            self->fused_cm = 0.0;
-            self->valid = true;
-            return;
-        }
-
-        /* ToF inside its trusted band. */
-        if (tof_cm <= FR_TOF_TRUST_MAX_CM)
-        {
-            /* Bring the Sharp in only once we're above its near fold-back zone. */
-            if (sharp_ok && (tof_cm >= FR_SHARP_MIN_CM))
-            {
-                double diff = tof_cm - sharp_cm;
-                if (diff < 0.0)
-                {
-                    diff = -diff;
-                }
-
-                if (diff <= FR_AGREE_TOL_CM)
-                {
-                    /* Both agree -> average for a smoother estimate. */
-                    self->fused_cm = (tof_cm + sharp_cm) * 0.5;
-                }
-                else
-                {
-                    /* Disagreement -> trust the ToF. */
-                    self->fused_cm = tof_cm;
-                }
-            }
-            else
-            {
-                /* ~4-8 cm, or no usable Sharp: ToF alone. */
-                self->fused_cm = tof_cm;
-            }
-
-            self->valid = true;
-            return;
-        }
-
-        /* tof_cm > trust max -> ToF reads "far"; let the Sharp take over below. */
+        self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
+        self->valid = true;
+        return;
     }
 
-    /* Fallback: Sharp (far range / ToF saturated or blocked). */
+    /* >= 15 cm, or ToF out of its short range: the Sharp is the final result. */
     if (sharp_ok)
     {
         self->fused_cm = sharp_cm;
+        self->valid = true;
+        return;
+    }
+
+    /* Sharp unusable but the ToF still has a reading -> fall back to it. */
+    if (tof_ok)
+    {
+        self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
         self->valid = true;
         return;
     }
