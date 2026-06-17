@@ -18,7 +18,7 @@ double Range::Distance()
     lastSharp = sharpCm;
     lastTof   = tofCm;
 
-    usingTof = (tofCm > 0 && tofCm < TOF_RANGE_LIMIT);
+    usingTof = (tofCm > 0 && tofCm < TOF_BLIND_CM);
 
     distance = usingTof ? tofCm : sharpCm;
     return distance;

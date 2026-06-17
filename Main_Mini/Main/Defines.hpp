@@ -28,10 +28,10 @@
 // VL53L0X Time-of-Flight (I2C: SDA = A4, SCL = A5)
 #define TOF_UPDATE_INTERVAL 40
 
-// Sharp <-> ToF handoff (cm). The ToF is linear and low-error, so it owns
-// the decision: use the ToF while it reads closer than this limit, hand to
-// the Sharp when the ToF reads farther (or drops out of range).
-#define TOF_RANGE_LIMIT         18.0
+// Sharp <-> ToF handoff (cm). The ToF reports ~819 cm (8190 mm) when it sees
+// nothing. So use the ToF whenever it returns a real reading, and fall back
+// to the Sharp only when the ToF is blind (>= this) or times out (<= 0).
+#define TOF_BLIND_CM            800.0
 
 // -------------------- MOTOR DRIVER (TB6612FNG) -------------
 // Each motor: one PWM (speed) pin + two direction pins.
