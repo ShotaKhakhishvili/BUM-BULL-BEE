@@ -38,5 +38,8 @@ void loop()
         ir2.DebugPrint();
 
         lastDebugPrint = millis();
+
+        for(int i = 0; i < 50; i++)
+            Serial.println(".");
     }
 }

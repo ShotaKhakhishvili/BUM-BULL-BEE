@@ -17,4 +17,7 @@ private:
 
     bool usingTof;
     double distance;
+
+    double lastSharp;   // values used by the most recent decision (debug)
+    double lastTof;
 };
