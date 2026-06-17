@@ -3,48 +3,21 @@
 
 #include <Wire.h>
 
-void Tof::ScanI2C()
-{
-    Serial.println("I2C scan...");
-
-    int found = 0;
-    for (byte addr = 1; addr < 127; ++addr)
-    {
-        Wire.beginTransmission(addr);
-        if (Wire.endTransmission() == 0)
-        {
-            Serial.print("  device at 0x");
-            Serial.println(addr, HEX);
-            ++found;
-        }
-    }
-
-    if (found == 0)
-        Serial.println("  no I2C devices found (check SDA/SCL/VCC/GND wiring)");
-}
-
 void Tof::Init()
 {
     Wire.begin();
 
-    // The VL53L0X needs a few ms after power-up before it answers I2C, and a
-    // cold boot often misses the very first begin(). Let it settle, then
-    // retry a handful of times instead of giving up after one attempt.
-    delay(100);
-    ScanI2C();   // report what's on the bus before boot
-
-    // Adafruit begin() boots the sensor over I2C (default address 0x29).
-    ready = false;
-    for (int attempt = 0; attempt < 5 && !ready; ++attempt)
+    // Pololu VL53L0X connection sequence that works on this sensor.
+    ready = sensor.init();
+    if (ready)
     {
-        ready = lox.begin();
-        if (!ready)
-            delay(50);
+        sensor.setTimeout(50);
+        sensor.startContinuous(20);   // new reading every 20 ms
     }
 
     lastUpdateTime = -TOF_UPDATE_INTERVAL;
     rawMillimeters = -1;
-    inRange = false;
+    timedOut = false;
     distance = -1.0;
 
     Distance();
@@ -55,7 +28,7 @@ double Tof::Distance()
     if (!ready)
     {
         this->rawMillimeters = -1;
-        this->inRange = false;
+        this->timedOut = false;
         this->distance = -1.0;
         return distance;
     }
@@ -64,22 +37,12 @@ double Tof::Distance()
 
     if (now >= TOF_UPDATE_INTERVAL + lastUpdateTime)
     {
-        VL53L0X_RangingMeasurementData_t measure;
-        lox.rangingTest(&measure, false);
+        this->rawMillimeters = sensor.readRangeContinuousMillimeters();
+        this->timedOut = sensor.timeoutOccurred();
 
-        // RangeStatus 4 = phase failure / out of range -> data is invalid.
-        if (measure.RangeStatus != 4)
-        {
-            this->rawMillimeters = measure.RangeMilliMeter;
-            this->inRange = true;
-            this->distance = rawMillimeters / 10.0; // mm -> cm
-        }
-        else
-        {
-            this->rawMillimeters = -1;
-            this->inRange = false;
-            this->distance = -1.0; // out of range -> "no close target"
-        }
+        // On timeout report invalid; otherwise mm -> cm. (Out-of-range comes
+        // back as a large value, which Range treats as "far" automatically.)
+        this->distance = timedOut ? -1.0 : (rawMillimeters / 10.0);
 
         lastUpdateTime = now;
     }
@@ -99,9 +62,9 @@ void Tof::DebugPrint()
         return;
     }
 
-    if (!inRange)
+    if (timedOut)
     {
-        Serial.println("out of range");
+        Serial.println("TIMEOUT");
         return;
     }
 

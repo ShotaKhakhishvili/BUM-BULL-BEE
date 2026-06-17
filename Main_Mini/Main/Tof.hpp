@@ -1,23 +1,21 @@
 #pragma once
 
-#include "Adafruit_VL53L0X.h"
+#include <VL53L0X.h>
 
 class Tof
 {
 public:
 
 void Init();
-double Distance();   // cm; <= 0 means not ready or out of range
+double Distance();   // cm; <= 0 means not ready or timeout
 void DebugPrint();
 
 private:
 
-void ScanI2C();   // boot-time bus probe; VL53L0X should answer at 0x29
-
-Adafruit_VL53L0X lox;
+VL53L0X sensor;
 
 bool ready;
-bool inRange;
+bool timedOut;
 
 unsigned long lastUpdateTime;
 
