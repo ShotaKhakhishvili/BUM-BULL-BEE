@@ -67,8 +67,8 @@
 
 // -------------------- BEHAVIOR -----------------------------
 
-#define DETECT_DISTANCE   60.0
-#define LOSE_DISTANCE     70.0
+#define DETECT_DISTANCE   55.0
+#define LOSE_DISTANCE     60.0
 
 #define SEEK_SPEED        120   
 #define CHASE_SPEED       190  
