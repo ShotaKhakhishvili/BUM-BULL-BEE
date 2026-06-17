@@ -29,9 +29,6 @@ void loop()
 
     Behavior::Update(front);
 
-    Serial.print("Switching Distance: ");
-    Serial.println(front);
-
     if(millis() - lastDebugPrint >= 1000)
     {
         Behavior::DebugPrint();
