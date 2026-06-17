@@ -15,16 +15,9 @@ double Range::Distance()
     const double sharpCm = sharp.Distance();
     const double tofCm   = tof.Distance();
 
-    if (usingTof)
-    {
-        if (tofCm <= 0 || tofCm >= SHARP_SWITCH_DISTANCE)
-            usingTof = false;
-    }
-    else
-    {
-        if (sharpCm < TOF_SWITCH_DISTANCE && tofCm > 0 && tofCm < SHARP_SWITCH_DISTANCE)
-            usingTof = true;
-    }
+    // ToF drives the choice: trust it while it reads within range and closer
+    // than the limit; otherwise (far or dropped out) fall back to the Sharp.
+    usingTof = (tofCm > 0 && tofCm < TOF_RANGE_LIMIT);
 
     distance = usingTof ? tofCm : sharpCm;
     return distance;
