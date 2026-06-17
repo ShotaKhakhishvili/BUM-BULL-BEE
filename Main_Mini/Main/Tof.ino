@@ -26,10 +26,21 @@ void Tof::ScanI2C()
 void Tof::Init()
 {
     Wire.begin();
+
+    // The VL53L0X needs a few ms after power-up before it answers I2C, and a
+    // cold boot often misses the very first begin(). Let it settle, then
+    // retry a handful of times instead of giving up after one attempt.
+    delay(100);
     ScanI2C();   // report what's on the bus before boot
 
     // Adafruit begin() boots the sensor over I2C (default address 0x29).
-    ready = lox.begin();
+    ready = false;
+    for (int attempt = 0; attempt < 5 && !ready; ++attempt)
+    {
+        ready = lox.begin();
+        if (!ready)
+            delay(50);
+    }
 
     lastUpdateTime = -TOF_UPDATE_INTERVAL;
     rawMillimeters = -1;
