@@ -31,8 +31,7 @@ void loop()
 
     if(millis() - lastDebugPrint >= 1000)
     {
-        for(int i = 0; i < 50; i++)
-            Serial.println(".");
+        Serial.println("--------------------------------------------");
         
         Behavior::DebugPrint();
         Move::DebugPrint();
