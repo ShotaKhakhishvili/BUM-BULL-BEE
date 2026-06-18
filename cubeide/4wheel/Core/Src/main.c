@@ -116,7 +116,7 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * forward with the electromagnet held at 100. Set to 0 to restore the normal
  * strategy dispatch. */
 #define APP_FORWARD_MAGNET_TEST 1
-#define APP_FORWARD_TEST_SPEED  150
+#define APP_FORWARD_TEST_SPEED  255
 
 typedef enum
 {
@@ -272,8 +272,8 @@ int main(void)
 #endif
 
 #if APP_FORWARD_MAGNET_TEST
-    /* Straight-forward bench test: magnet at 100, drive forward. */
-    Magnet_SetStrength(&g_magnet, MAGNET_STRENGTH_DEFAULT);
+    /* Straight-forward bench test: magnet at max, drive forward at max. */
+    Magnet_SetStrength(&g_magnet, MAGNET_PWM_PERIOD);
     Move_Walk(&move, MOVE_FORWARD, APP_FORWARD_TEST_SPEED);
     Move_Update(&move);
 #else
