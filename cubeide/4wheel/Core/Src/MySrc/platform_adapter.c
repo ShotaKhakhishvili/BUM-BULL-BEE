@@ -222,12 +222,9 @@ void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit)
 
 void Platform_MagnetStartPwm(void)
 {
-    /* TIM1 is an advanced-control timer: the OC output only reaches PA11 once the
-     * Main Output Enable (MOE) bit is set. HAL_TIM_PWM_Start sets it, but only
-     * after an internal channel-state check that can early-return; enable it
-     * explicitly so a dead output can't slip through. */
+    /* TIM1 is an advanced-control timer; HAL_TIM_PWM_Start also enables the
+     * main output (MOE) for break-capable instances, so PA11 actually drives. */
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-    __HAL_TIM_MOE_ENABLE(&htim1);
 }
 
 void Platform_MagnetSetCompare(uint16_t compare)
