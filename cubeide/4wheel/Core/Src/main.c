@@ -107,6 +107,11 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FINISH_PORT     GPIOA
 #define APP_FINISH_PIN      GPIO_PIN_9
 
+/* Temporarily disable the PA8 start gate and PA9 finish handling: when 0 the bot
+ * runs the selected strategy immediately and never auto-halts. Set back to 1 to
+ * restore the start/finish signal logic. */
+#define APP_USE_START_FINISH_SIGNALS 0
+
 typedef enum
 {
     APP_STRATEGY_0 = 0,   /* PB5 == 0: seek / chase / catch (implemented) */
@@ -233,11 +238,13 @@ int main(void)
                  ? APP_STRATEGY_1
                  : APP_STRATEGY_0;
 
+#if APP_USE_START_FINISH_SIGNALS
   /* Hold position until the start module asserts PA8. Magnets already grip. */
   while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) != GPIO_PIN_SET)
   {
     /* idle: motors stopped, magnets holding at default */
   }
+#endif
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -247,6 +254,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+#if APP_USE_START_FINISH_SIGNALS
     /* Finish: PA9 high ends the match. Stop driving, release the magnets, and
      * halt - no further sensing or movement. */
     if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
@@ -255,6 +263,7 @@ int main(void)
       Magnet_Off(&g_magnet);
       break;
     }
+#endif
 
     if (g_strategy == APP_STRATEGY_1)
     {
@@ -269,12 +278,14 @@ int main(void)
   }
   /* USER CODE END 3 */
 
+#if APP_USE_START_FINISH_SIGNALS
   /* Match over: sit idle with motors stopped and magnets de-energized. */
   Move_Stop(&move);
   Magnet_Off(&g_magnet);
   while (1)
   {
   }
+#endif
 }
 
 /**
