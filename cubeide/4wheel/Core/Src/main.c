@@ -31,6 +31,7 @@
 #include "MySrc/debug_vars.h"
 #include "MySrc/forward_range.h"
 #include "MySrc/light.h"
+#include "MySrc/magnet.h"
 #include "MySrc/median_calculator.h"
 #include "MySrc/move.h"
 #include "MySrc/platform_adapter.h"
@@ -85,6 +86,7 @@ static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
 static Move move;
 static Seek g_seek;
+static Magnet g_magnet;
 static Light g_fr;
 static Light g_fl;
 static Light g_br;
@@ -93,6 +95,25 @@ static Light g_bl;
 /* Fast seek tuning template: update values here for quick strategy iteration. */
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
+
+/* Match control signals (all active-high level inputs, stable from power-up):
+ *   PB5 - strategy select, latched once at boot (0 -> strategy 0, 1 -> strategy 1)
+ *   PA8 - start: the match begins when this reads 1
+ *   PA9 - finish: the match ends (stop + magnets off) when this reads 1 */
+#define APP_STRATEGY_PORT   GPIOB
+#define APP_STRATEGY_PIN    GPIO_PIN_5
+#define APP_START_PORT      GPIOA
+#define APP_START_PIN       GPIO_PIN_8
+#define APP_FINISH_PORT     GPIOA
+#define APP_FINISH_PIN      GPIO_PIN_9
+
+typedef enum
+{
+    APP_STRATEGY_0 = 0,   /* PB5 == 0: seek / chase / catch (implemented) */
+    APP_STRATEGY_1 = 1    /* PB5 == 1: alternate strategy (stub)          */
+} AppStrategy;
+
+static volatile AppStrategy g_strategy = APP_STRATEGY_0;
 
 static Light *g_lights[4] =
 {
@@ -117,6 +138,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
+static void App_Strategy0_Tick(void);   /* seek / chase / catch */
+static void App_Strategy1_Tick(void);   /* alternate strategy (stub) */
 #if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
 static void SensorTest_Run(void);
 #endif
@@ -191,6 +214,7 @@ int main(void)
   Move_Init(&move);
   Seek_Init(&g_seek);
   Seek_SetTuning(&g_seek, &g_seek_tuning);
+  Magnet_Init(&g_magnet);   /* PWM up + default holding force from power-up */
   WS2812B_Init();
 
   {
@@ -204,6 +228,17 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  /* Latch the strategy from PB5 once at boot (the line is stable from power-up). */
+  g_strategy = (HAL_GPIO_ReadPin(APP_STRATEGY_PORT, APP_STRATEGY_PIN) == GPIO_PIN_SET)
+                 ? APP_STRATEGY_1
+                 : APP_STRATEGY_0;
+
+  /* Hold position until the start module asserts PA8. Magnets already grip. */
+  while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) != GPIO_PIN_SET)
+  {
+    /* idle: motors stopped, magnets holding at default */
+  }
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -212,27 +247,34 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    SharpManager_Update(&g_sharp_manager);
-    Vl53l0x_Update(&g_tof);
-    CloseIR_Update(&g_close_ir);
-
-    ForwardRange_Update(&g_forward);
-
-    if (Seek_IsTargetVisible(&g_seek))
+    /* Finish: PA9 high ends the match. Stop driving, release the magnets, and
+     * halt - no further sensing or movement. */
+    if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
     {
-      g_seek_mode = CloseIR_SeesObject(&g_close_ir) ? SEEK_MODE_CATCH : SEEK_MODE_CHASE;
+      Move_Stop(&move);
+      Magnet_Off(&g_magnet);
+      break;
+    }
+
+    if (g_strategy == APP_STRATEGY_1)
+    {
+      App_Strategy1_Tick();
     }
     else
     {
-      g_seek_mode = SEEK_MODE_LOOK;
+      App_Strategy0_Tick();
     }
-
-    Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
-    Move_Update(&move);
 
     HAL_Delay(5);
   }
   /* USER CODE END 3 */
+
+  /* Match over: sit idle with motors stopped and magnets de-energized. */
+  Move_Stop(&move);
+  Magnet_Off(&g_magnet);
+  while (1)
+  {
+  }
 }
 
 /**
@@ -469,10 +511,65 @@ static void App_InitParityGpio(void)
   gpio.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &gpio);
 
-  gpio.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_13;
+  gpio.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_13;
   gpio.Mode = GPIO_MODE_INPUT;
   gpio.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &gpio);
+
+  /* PB5 = strategy select: pull-down so a disconnected line defaults to strategy 0. */
+  gpio.Pin = GPIO_PIN_5;
+  gpio.Mode = GPIO_MODE_INPUT;
+  gpio.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOB, &gpio);
+}
+
+/*
+ * Strategy 0 (PB5 == 0): seek / chase / catch.
+ * One control tick - refresh sensors, pick the seek mode, drive, and set the
+ * magnet grip from opponent proximity (default holding, stronger when close).
+ */
+static void App_Strategy0_Tick(void)
+{
+  SharpManager_Update(&g_sharp_manager);
+  Vl53l0x_Update(&g_tof);
+  CloseIR_Update(&g_close_ir);
+
+  ForwardRange_Update(&g_forward);
+
+  if (Seek_IsTargetVisible(&g_seek))
+  {
+    g_seek_mode = CloseIR_SeesObject(&g_close_ir) ? SEEK_MODE_CATCH : SEEK_MODE_CHASE;
+  }
+  else
+  {
+    g_seek_mode = SEEK_MODE_LOOK;
+  }
+
+  /* Clamp down harder when an opponent is right in front, otherwise just hold. */
+  if (CloseIR_SeesObject(&g_close_ir))
+  {
+    Magnet_Close(&g_magnet);
+  }
+  else
+  {
+    Magnet_Default(&g_magnet);
+  }
+
+  Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
+  Move_Update(&move);
+}
+
+/*
+ * Strategy 1 (PB5 == 1): alternate strategy.
+ * TODO: implement the second behaviour here. Runs every ~5 ms while the match
+ * is active. The shared modules (g_sharp_manager, g_tof, g_forward, g_close_ir,
+ * g_seek, move, g_magnet) are available exactly as in App_Strategy0_Tick.
+ */
+static void App_Strategy1_Tick(void)
+{
+  /* Placeholder: hold still until implemented. */
+  Move_Stop(&move);
+  Magnet_Default(&g_magnet);
 }
 
 /* USER CODE END 4 */

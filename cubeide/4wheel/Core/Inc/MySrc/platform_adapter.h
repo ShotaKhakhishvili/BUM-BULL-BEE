@@ -56,4 +56,8 @@ void Platform_DelayMs(uint32_t ms);
 void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit);
 bool Platform_ReadDigitalInput(uint8_t input_id);
 
+/* Magnet attachment PWM on PA11 / TIM1_CH4 (raw compare, 0..TIM1 period = 1000). */
+void Platform_MagnetStartPwm(void);
+void Platform_MagnetSetCompare(uint16_t compare);
+
 #endif /* MYSRC_PLATFORM_ADAPTER_H */

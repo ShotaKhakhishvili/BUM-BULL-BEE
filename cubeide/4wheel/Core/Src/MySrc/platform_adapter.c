@@ -220,6 +220,18 @@ void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit)
     }
 }
 
+void Platform_MagnetStartPwm(void)
+{
+    /* TIM1 is an advanced-control timer; HAL_TIM_PWM_Start also enables the
+     * main output (MOE) for break-capable instances, so PA11 actually drives. */
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+}
+
+void Platform_MagnetSetCompare(uint16_t compare)
+{
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, compare);
+}
+
 bool Platform_ReadDigitalInput(uint8_t input_id)
 {
     GPIO_TypeDef *port;
