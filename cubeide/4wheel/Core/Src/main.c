@@ -272,9 +272,9 @@ int main(void)
 #endif
 
 #if APP_FORWARD_MAGNET_TEST
-    /* Straight-forward bench test: magnet at max, drive forward at max. */
+    /* Bench test: magnet at max, motors off (walking disabled). */
     Magnet_SetStrength(&g_magnet, MAGNET_PWM_PERIOD);
-    Move_Walk(&move, MOVE_FORWARD, APP_FORWARD_TEST_SPEED);
+    Move_Stop(&move);
     Move_Update(&move);
 #else
     if (g_strategy == APP_STRATEGY_1)
