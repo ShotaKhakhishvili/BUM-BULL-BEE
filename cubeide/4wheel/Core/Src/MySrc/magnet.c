@@ -9,9 +9,9 @@ void Magnet_SetStrength(Magnet *self, uint16_t strength)
         return;
     }
 
-    if (strength > MAGNET_PWM_PERIOD)
+    if (strength > MAGNET_STRENGTH_MAX)
     {
-        strength = MAGNET_PWM_PERIOD;
+        strength = MAGNET_STRENGTH_MAX;
     }
 
     self->strength = strength;
@@ -44,6 +44,11 @@ void Magnet_Default(Magnet *self)
 void Magnet_Close(Magnet *self)
 {
     Magnet_SetStrength(self, MAGNET_STRENGTH_CLOSE);
+}
+
+void Magnet_Full(Magnet *self)
+{
+    Magnet_SetStrength(self, MAGNET_STRENGTH_MAX);
 }
 
 void Magnet_Off(Magnet *self)

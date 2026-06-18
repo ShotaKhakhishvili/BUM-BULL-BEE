@@ -272,8 +272,8 @@ int main(void)
 #endif
 
 #if APP_FORWARD_MAGNET_TEST
-    /* Bench test: magnet at max, motors off (walking disabled). */
-    Magnet_SetStrength(&g_magnet, MAGNET_PWM_PERIOD);
+    /* Bench test: magnet full-on, motors off (walking disabled). */
+    Magnet_Full(&g_magnet);
     Move_Stop(&move);
     Move_Update(&move);
 #else

@@ -21,6 +21,8 @@
 #define MAGNET_STRENGTH_OFF         0U
 #define MAGNET_STRENGTH_DEFAULT   100U
 #define MAGNET_STRENGTH_CLOSE     200U
+/* Full-on: compare > period keeps the output active every tick (true 100%% / DC). */
+#define MAGNET_STRENGTH_MAX     (MAGNET_PWM_PERIOD + 1U)
 
 typedef struct
 {
@@ -36,6 +38,7 @@ void Magnet_SetStrength(Magnet *self, uint16_t strength);
 
 void Magnet_Default(Magnet *self);   /* MAGNET_STRENGTH_DEFAULT */
 void Magnet_Close(Magnet *self);     /* MAGNET_STRENGTH_CLOSE   */
+void Magnet_Full(Magnet *self);      /* MAGNET_STRENGTH_MAX (full-on) */
 void Magnet_Off(Magnet *self);       /* de-energize (release)   */
 
 uint16_t Magnet_GetStrength(const Magnet *self);
