@@ -112,6 +112,12 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * restore the start/finish signal logic. */
 #define APP_USE_START_FINISH_SIGNALS 0
 
+/* Temporary bench behaviour: ignore the strategies and just drive straight
+ * forward with the electromagnet held at 100. Set to 0 to restore the normal
+ * strategy dispatch. */
+#define APP_FORWARD_MAGNET_TEST 1
+#define APP_FORWARD_TEST_SPEED  150
+
 typedef enum
 {
     APP_STRATEGY_0 = 0,   /* PB5 == 0: seek / chase / catch (implemented) */
@@ -265,6 +271,12 @@ int main(void)
     }
 #endif
 
+#if APP_FORWARD_MAGNET_TEST
+    /* Straight-forward bench test: magnet at 100, drive forward. */
+    Magnet_SetStrength(&g_magnet, MAGNET_STRENGTH_DEFAULT);
+    Move_Walk(&move, MOVE_FORWARD, APP_FORWARD_TEST_SPEED);
+    Move_Update(&move);
+#else
     if (g_strategy == APP_STRATEGY_1)
     {
       App_Strategy1_Tick();
@@ -273,6 +285,7 @@ int main(void)
     {
       App_Strategy0_Tick();
     }
+#endif
 
     HAL_Delay(5);
   }
