@@ -5,6 +5,7 @@
 
 #include "Move.hpp"
 #include "Behavior.hpp"
+#include "RunState.hpp"
 
 Range range;
 Infrared ir1, ir2;
@@ -21,10 +22,18 @@ void setup()
     range.Init();           // Sharp (A3) + ToF (I2C: A4/A5)
     ir1.Init(IR1);          // D7
     ir2.Init(IR2);          // D8
+
+    RunState::Init();       // start (D2) / stop (D1) interrupts
 }
 
 void loop()
 {
+    if(!RunState::IsRunning())
+    {
+        Move::Walk(FORWARD, 0);
+        return;
+    }
+
     double front = range.Distance();
 
     Behavior::Update(front);
@@ -33,6 +42,7 @@ void loop()
     {
         Serial.println("--------------------------------------------");
 
+        RunState::DebugPrint();
         Behavior::DebugPrint();
         Move::DebugPrint();
         range.DebugPrint();

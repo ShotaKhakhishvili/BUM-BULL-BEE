@@ -47,6 +47,11 @@
 
 // -------------------- OTHERS -------------------------------
 
+// Start/stop signal lines. WARNING: STOP is on D1, the UART TX pin - it
+// can't be read reliably while Serial is active.
+#define START_PIN     2     // D2 - INT0
+#define STOP_PIN      1     // D1 - PCINT17
+
 #define RESET         13
 
 #define SW_ON         1
