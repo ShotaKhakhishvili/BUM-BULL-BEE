@@ -239,19 +239,6 @@ int main(void)
 
   /* USER CODE END 2 */
 
-  /* Latch the strategy from PB5 once at boot (the line is stable from power-up). */
-  g_strategy = (HAL_GPIO_ReadPin(APP_STRATEGY_PORT, APP_STRATEGY_PIN) == GPIO_PIN_SET)
-                 ? APP_STRATEGY_1
-                 : APP_STRATEGY_0;
-
-#if APP_USE_START_FINISH_SIGNALS
-  /* Hold position until the start module asserts PA8. Magnets already grip. */
-  while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) != GPIO_PIN_SET)
-  {
-    /* idle: motors stopped, magnets holding at default */
-  }
-#endif
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -290,15 +277,6 @@ int main(void)
     HAL_Delay(5);
   }
   /* USER CODE END 3 */
-
-#if APP_USE_START_FINISH_SIGNALS
-  /* Match over: sit idle with motors stopped and magnets de-energized. */
-  Move_Stop(&move);
-  Magnet_Off(&g_magnet);
-  while (1)
-  {
-  }
-#endif
 }
 
 /**
