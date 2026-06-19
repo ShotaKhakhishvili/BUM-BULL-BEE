@@ -183,7 +183,7 @@ static float Seek_CalcualteRotationCoefficient(
         if(absDiff < 0)
             absDiff = -absDiff;
 
-        return 1 - (absDiff / 255) * 10;
+        return 1 - (absDiff / 255) * 2;
     }
     if(!sees_left && !sees_right)
     {
