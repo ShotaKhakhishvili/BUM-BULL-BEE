@@ -120,14 +120,12 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FORWARD_TEST_SPEED  255
 
 /* Edge reflex. The two wired light sensors watch the arena boundary: on the
- * trigger color the bot stops, reverses, then spins away from whichever side hit
- * the line (left sensor -> rotate right, right sensor -> rotate left), then
- * resumes. Sensor->side mapping is set in App_SeesLine(); swap it there if the
- * bot turns the wrong way. Tune the durations/speeds here. */
+ * trigger color the bot stops and spins away from whichever side hit the line
+ * (left sensor -> rotate right, right sensor -> rotate left), then resumes.
+ * Sensor->side mapping is set in App_SeesLine(); swap it there if the bot turns
+ * the wrong way. Tune the duration/speed here. */
 #define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
-#define APP_LINE_BACKUP_MS      500U
 #define APP_LINE_ROTATE_MS      500U
-#define APP_LINE_BACKUP_SPEED   255
 #define APP_LINE_ROTATE_SPEED   255
 
 typedef enum
@@ -576,17 +574,14 @@ static bool App_SeesLine(bool *rotate_dir)
 }
 
 /*
- * Line reflex: stop, reverse for APP_LINE_BACKUP_MS, then rotate in place for
- * APP_LINE_ROTATE_MS in rotate_dir, then stop. Normal movement resumes on the
- * next loop tick. This blocks for ~1 s, during which nothing else runs -
- * acceptable for a boundary escape, but see the note if you need sensing live.
+ * Line reflex: stop, then rotate in place for APP_LINE_ROTATE_MS in rotate_dir,
+ * then stop. Normal movement resumes on the next loop tick. This blocks for
+ * ~0.5 s, during which nothing else runs - acceptable for a boundary escape, but
+ * see the note if you need sensing live.
  */
 static void App_LineAvoidManeuver(bool rotate_dir)
 {
   Move_Stop(&move);
-
-  Move_Walk(&move, MOVE_BACKWARD, APP_LINE_BACKUP_SPEED);
-  Platform_DelayMs(APP_LINE_BACKUP_MS);
 
   Move_RotateOnPoint(&move, rotate_dir, APP_LINE_ROTATE_SPEED);
   Platform_DelayMs(APP_LINE_ROTATE_MS);
