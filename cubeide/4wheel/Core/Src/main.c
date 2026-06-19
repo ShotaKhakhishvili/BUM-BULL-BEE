@@ -110,10 +110,10 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FINISH_PORT     GPIOA
 #define APP_FINISH_PIN      GPIO_PIN_9
 
-/* Temporarily disable the PA8 start gate and PA9 finish handling: when 0 the bot
- * runs the selected strategy immediately and never auto-halts. Set back to 1 to
- * restore the start/finish signal logic. */
-#define APP_USE_START_FINISH_SIGNALS 0
+/* PA8 start gate and PA9 finish handling: when 1 the bot stays planted until the
+ * start signal (PA8) goes high, then runs the strategy, and halts when the finish
+ * signal (PA9) goes high. Set to 0 to run immediately and never auto-halt. */
+#define APP_USE_START_FINISH_SIGNALS 1
 
 /* Temporary bench behaviour: ignore the strategies and just drive straight
  * forward with the electromagnet held at 100. Set to 0 to restore the normal
@@ -252,6 +252,17 @@ int main(void)
     }
   }
 
+#if APP_USE_START_FINISH_SIGNALS
+  /* Start gate: stay planted (motors stopped, magnet engaged) until the start
+   * signal goes high on PA8, so the bot never moves before the match begins. */
+  Move_Stop(&move);
+  Magnet_Default(&g_magnet);
+  while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_RESET)
+  {
+    /* wait for start */
+  }
+#endif
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -302,6 +313,15 @@ int main(void)
 
     HAL_Delay(5);
   }
+
+#if APP_USE_START_FINISH_SIGNALS
+  /* Match finished (PA9): remain stopped and de-energized for good. */
+  Move_Stop(&move);
+  Magnet_Off(&g_magnet);
+  while (1)
+  {
+  }
+#endif
   /* USER CODE END 3 */
 }
 
