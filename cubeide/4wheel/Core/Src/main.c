@@ -125,7 +125,7 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * APP_LINE_ROTATE_DIR (ROT_RIGHT/ROT_LEFT) to change which way it turns away. */
 #define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
 #define APP_LINE_BACKUP_MS      250U
-#define APP_LINE_ROTATE_MS      250U
+#define APP_LINE_ROTATE_MS      500U
 #define APP_LINE_BACKUP_SPEED   150
 #define APP_LINE_ROTATE_SPEED   150
 #define APP_LINE_ROTATE_DIR     ROT_RIGHT
