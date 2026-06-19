@@ -627,19 +627,11 @@ static void App_Strategy0_Tick(void)
 
   ForwardRange_Update(&g_forward);
 
-  /* Chase whenever a target is visible, otherwise scan. The magnet follows that:
-   * released while scanning (so the bot spins/searches freely) and engaged the
-   * moment we have a target to chase/catch (grip the floor to push). */
-  if (Seek_IsTargetVisible(&g_seek))
-  {
-    g_seek_mode = SEEK_MODE_CHASE;
-    Magnet_Default(&g_magnet);   /* grip while chasing/catching */
-  }
-  else
-  {
-    g_seek_mode = SEEK_MODE_LOOK;
-    Magnet_Off(&g_magnet);       /* release while rotating to search */
-  }
+  /* Chase whenever a target is visible, otherwise scan. */
+  g_seek_mode = Seek_IsTargetVisible(&g_seek) ? SEEK_MODE_CHASE : SEEK_MODE_LOOK;
+
+  /* Magnet (PA1, on/off) stays energized to hold the chassis down. */
+  Magnet_Default(&g_magnet);
 
   Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
   Move_Update(&move);
