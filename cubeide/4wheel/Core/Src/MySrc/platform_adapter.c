@@ -222,14 +222,27 @@ void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit)
 
 void Platform_MagnetStartPwm(void)
 {
-    /* TIM1 is an advanced-control timer; HAL_TIM_PWM_Start also enables the
-     * main output (MOE) for break-capable instances, so PA11 actually drives. */
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+    /* The magnet is now driven as a plain on/off GPIO on PA1 (no PWM). Configure
+     * the pin here so the setup survives a CubeMX regen of the generated files,
+     * and start de-energized. */
+    GPIO_InitTypeDef gpio = {0};
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+
+    gpio.Pin = GPIO_PIN_1;
+    gpio.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio.Pull = GPIO_NOPULL;
+    gpio.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &gpio);
 }
 
 void Platform_MagnetSetCompare(uint16_t compare)
 {
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, compare);
+    /* On/off control: any non-zero strength energizes the magnet, zero releases
+     * it. The DEFAULT and CLOSE strength levels therefore both map to "on". */
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, (compare > 0U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 bool Platform_ReadDigitalInput(uint8_t input_id)

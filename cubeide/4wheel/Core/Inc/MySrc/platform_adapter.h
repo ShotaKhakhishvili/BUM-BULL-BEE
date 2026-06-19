@@ -24,7 +24,7 @@
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_CLOSE_A
-#define PLATFORM_ADC_IDX_IR_CLOSE_A 0U /* PA1 / ADC1_IN1 */
+#define PLATFORM_ADC_IDX_IR_CLOSE_A 0U /* PA4 / ADC1_IN4 (moved off PA1, now the magnet) */
 #endif
 
 uint32_t Platform_Millis(void);
@@ -56,7 +56,9 @@ void Platform_DelayMs(uint32_t ms);
 void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit);
 bool Platform_ReadDigitalInput(uint8_t input_id);
 
-/* Magnet attachment PWM on PA11 / TIM1_CH4 (raw compare, 0..TIM1 period = 1000). */
+/* Magnet attachment as on/off GPIO on PA1 (was PWM on PA11 / TIM1_CH4). The
+ * compare argument is treated as a threshold: non-zero energizes, zero releases.
+ * Function names kept for API compatibility with the Magnet module. */
 void Platform_MagnetStartPwm(void);
 void Platform_MagnetSetCompare(uint16_t compare);
 

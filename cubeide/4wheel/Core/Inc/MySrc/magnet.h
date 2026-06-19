@@ -5,17 +5,18 @@
 #include <stdint.h>
 
 /*
- * Electromagnet attachment control (PA11 / TIM1_CH4 PWM).
+ * Electromagnet attachment control (PA1, plain on/off GPIO).
  *
- * The magnets pull the chassis down onto the steel arena floor; the PWM duty
- * sets how hard it grips. Two operating levels are used during a match:
- *   - DEFAULT: a light, always-on holding force that still lets the bot drive.
- *   - CLOSE:   a stronger clamp engaged when an opponent is near, to resist
- *              being shoved off.
+ * The magnet pulls the chassis down onto the steel arena floor. It used to be
+ * PWM-driven (PA11 / TIM1_CH4) for variable grip, but it now hangs off a plain
+ * digital output on PA1, so grip is binary: any non-zero strength energizes the
+ * coil, zero releases it. The two match levels collapse accordingly:
+ *   - DEFAULT / CLOSE: magnet on (both non-zero).
+ *   - OFF:             magnet released.
  *
- * Strength is the raw TIM1 compare value on the 0..MAGNET_PWM_PERIOD scale.
- * TIM1's period is 1000, so 100 = 10%% duty and 200 = 20%%. Retune the DEFAULT /
- * CLOSE levels here if the holding force needs adjusting.
+ * The strength constants and the 0..MAGNET_PWM_PERIOD scale are kept so the rest
+ * of the code (and a future return to PWM) needs no changes; only the sign of
+ * the value matters while driven as GPIO.
  */
 #define MAGNET_PWM_PERIOD        1000U
 #define MAGNET_STRENGTH_OFF         0U
@@ -24,8 +25,8 @@
 
 typedef struct
 {
-    uint16_t strength;   /* last applied TIM1 compare value */
-    bool started;        /* true once the PWM channel is running */
+    uint16_t strength;   /* last applied strength (non-zero = energized) */
+    bool started;        /* true once the output has been brought up */
 } Magnet;
 
 /* Starts the PWM output and applies the DEFAULT holding strength. */
