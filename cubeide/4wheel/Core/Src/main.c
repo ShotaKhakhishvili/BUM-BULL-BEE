@@ -77,7 +77,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint16_t adc_raw[4] = {0};
+/* Length MUST match the ADC's NbrOfConversion (5: IN1,IN2,IN3,IN6,IN7 =
+ * PA1,PA2,PA3,PA6,PA7). A shorter circular buffer makes the channels rotate
+ * through the slots and scrambles every Sharp reading. Slots: [0]=PA1 (magnet,
+ * unused), [1]=PA2 (unused), [2]=PA3 IR_M, [3]=PA6 IR_L, [4]=PA7 IR_R. */
+volatile uint16_t adc_raw[5] = {0};
 
 static SharpManager g_sharp_manager;
 static Vl53l0x g_tof;
@@ -215,7 +219,7 @@ int main(void)
   SensorTest_Run();   /* never returns */
 #endif
 
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -415,10 +419,9 @@ static SharpManager s_sharp_test;
 
 static void SensorTest_Run(void)
 {
-  /* Start the ADC scan into adc_raw[] (DMA, circular). SharpManager reads from it
-   * via the platform adapter. NOTE: length here matches the current adc_raw[]
-   * size; see the warning I gave you about the ADC channel-count mismatch. */
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 4) != HAL_OK)
+  /* Start the ADC scan into adc_raw[] (DMA, circular). Length must match the
+   * ADC's NbrOfConversion (5); see the note on adc_raw[] for the slot map. */
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
     Error_Handler();
   }
