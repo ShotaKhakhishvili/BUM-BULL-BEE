@@ -5,5 +5,5 @@
 ../Core/Src/main.c:581:13:App_SeesLine	4
 ../Core/Src/main.c:605:13:App_LineAvoidManeuver	1
 ../Core/Src/main.c:623:13:App_Strategy0_Tick	2
-../Core/Src/main.c:646:13:App_Strategy1_Tick	1
-../Core/Src/main.c:659:6:Error_Handler	1
+../Core/Src/main.c:654:13:App_Strategy1_Tick	1
+../Core/Src/main.c:667:6:Error_Handler	1
