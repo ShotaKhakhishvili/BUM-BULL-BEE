@@ -119,10 +119,11 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FORWARD_MAGNET_TEST 1
 #define APP_FORWARD_TEST_SPEED  255
 
-/* Black-line edge reflex. The two wired light sensors (PB3 = COL2, PB4 = COL4)
- * watch the arena boundary: on a black line the bot stops, reverses, then spins
- * in place, then resumes normal movement. Tune the durations/speeds here. Flip
+/* Edge reflex. The two wired light sensors (PB3 = COL2, PB4 = COL4) watch the
+ * arena boundary: on the trigger color the bot stops, reverses, then spins in
+ * place, then resumes normal movement. Tune the durations/speeds here. Flip
  * APP_LINE_ROTATE_DIR (ROT_RIGHT/ROT_LEFT) to change which way it turns away. */
+#define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
 #define APP_LINE_BACKUP_MS      250U
 #define APP_LINE_ROTATE_MS      250U
 #define APP_LINE_BACKUP_SPEED   150
@@ -162,7 +163,7 @@ static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
 static void App_Strategy0_Tick(void);   /* seek / chase / catch */
 static void App_Strategy1_Tick(void);   /* alternate strategy (stub) */
-static bool App_SeesBlackLine(void);    /* PB3/PB4 light sensors on a black line */
+static bool App_SeesLine(void);         /* PB3/PB4 light sensors on the trigger color */
 static void App_LineAvoidManeuver(void);/* stop -> reverse -> rotate -> resume   */
 #if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
 static void SensorTest_Run(void);
@@ -274,7 +275,7 @@ int main(void)
     /* Edge reflex runs above the strategy: a black line under either light
      * sensor means we are at the arena boundary, so back off and turn away
      * before any normal driving this tick. */
-    if (App_SeesBlackLine())
+    if (App_SeesLine())
     {
       App_LineAvoidManeuver();
     }
@@ -549,15 +550,15 @@ static void App_InitParityGpio(void)
 }
 
 /*
- * Returns true when either edge light sensor reports a black line:
+ * Returns true when either edge light sensor reports the line color:
  *   PB3 = COL2 = g_fl,  PB4 = COL4 = g_bl.
- * BBB_BLACK follows the existing Light convention; if a sensor is wired the
- * other way round, flip its rev flag in the Light_Init loop above.
+ * The trigger color is APP_LINE_TRIGGER_COLOR - flip that define between
+ * BBB_WHITE and BBB_BLACK to reverse which color the bot reacts to.
  */
-static bool App_SeesBlackLine(void)
+static bool App_SeesLine(void)
 {
-  return (Light_GetCol(&g_fl) == BBB_BLACK) ||
-         (Light_GetCol(&g_bl) == BBB_BLACK);
+  return (Light_GetCol(&g_fl) == APP_LINE_TRIGGER_COLOR) ||
+         (Light_GetCol(&g_bl) == APP_LINE_TRIGGER_COLOR);
 }
 
 /*

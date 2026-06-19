@@ -11,8 +11,10 @@
 
 #define BBB_MAX_DISTANCE_CM 65.0
 
-#define BBB_WHITE false
-#define BBB_BLACK true
+/* Digital line-sensor levels as wired on this bot: black reads LOW (0), white
+ * reads HIGH (1). */
+#define BBB_WHITE true
+#define BBB_BLACK false
 
 #define BBB_LIGHT_REFRESH_MS 15U
 
