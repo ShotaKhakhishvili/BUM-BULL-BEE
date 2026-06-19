@@ -80,7 +80,7 @@
 /* Length MUST match the ADC's NbrOfConversion (5: IN1,IN2,IN3,IN6,IN7 =
  * PA1,PA2,PA3,PA6,PA7). A shorter circular buffer makes the channels rotate
  * through the slots and scrambles every Sharp reading. Slots: [0]=PA1 (magnet,
- * unused), [1]=PA2 (unused), [2]=PA3 IR_M, [3]=PA6 IR_L, [4]=PA7 IR_R. */
+ * unused), [1]=PA2 IR_M, [2]=PA3 (unused), [3]=PA6 IR_L, [4]=PA7 IR_R. */
 volatile uint16_t adc_raw[5] = {0};
 
 static SharpManager g_sharp_manager;

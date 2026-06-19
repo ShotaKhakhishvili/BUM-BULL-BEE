@@ -9,11 +9,11 @@
 #endif
 
 /* These indices are slots in adc_raw[], which mirrors the ADC scan order
- * rank1..5 = IN1,IN2,IN3,IN6,IN7 = PA1,PA2,PA3,PA6,PA7. Slots 0 (PA1, magnet)
- * and 1 (PA2, unused) are skipped; the Sharps live at 2..4. */
+ * rank1..5 = IN1,IN2,IN3,IN6,IN7 = PA1,PA2,PA3,PA6,PA7. Slot 0 (PA1, magnet)
+ * and 2 (PA3, unused) are skipped; the Sharps live at 1, 3, 4. */
 
 #ifndef PLATFORM_ADC_IDX_IR_M
-#define PLATFORM_ADC_IDX_IR_M 2U /* PA3 / ADC1_IN3 */
+#define PLATFORM_ADC_IDX_IR_M 1U /* PA2 / ADC1_IN2 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_R
