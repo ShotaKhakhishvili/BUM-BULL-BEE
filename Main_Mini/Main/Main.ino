@@ -20,8 +20,8 @@ void setup()
     Move::Init();           // TB6612FNG motor pins
 
     range.Init();           // Sharp (A3) + ToF (I2C: A4/A5)
-    ir1.Init(IR1);          // D7
-    ir2.Init(IR2);          // D8
+    ir1.Init(IR_READS_ANALOG ? IR1_ANALOG : IR1, IR_READS_ANALOG);
+    ir2.Init(IR_READS_ANALOG ? IR2_ANALOG : IR2, IR_READS_ANALOG);
 
     RunState::Init();       // start (D2) / stop (D1) interrupts
 }

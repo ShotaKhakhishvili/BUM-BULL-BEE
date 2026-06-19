@@ -14,12 +14,22 @@
 
 #define SHARP_PIN       A3      // Sharp GP2Y0A21 analog out
 
+// IR mode: false = digital modules on D7/D8, true = analog on A0/A1.
+#define IR_READS_ANALOG false
+
 #define IR1             7       // D7 - digital IR sensor
 #define IR2             8       // D8 - digital IR sensor
+
+#define IR1_ANALOG      A0      // analog IR sensor
+#define IR2_ANALOG      A1      // analog IR sensor
 
 // Logic level a digital IR module outputs when it sees a target.
 // Flip to HIGH if your modules are active-high.
 #define IR_DETECTED     LOW
+
+// Analog mode: detected when the reading is at/above this (flip >= in
+// Infrared::Detected if your sensor reads the other way).
+#define IR_ANALOG_THRESHOLD 500
 
 #define MODEL_LONG  1080    // GP2Y0A21YK0F : 10–80 cm
 #define SHARP_UPDATE_INTERVAL 40

@@ -1,16 +1,25 @@
 #include "Defines.hpp"
 #include "Infrared.hpp"
 
-void Infrared::Init(int pin)
+void Infrared::Init(int pin, bool readsAnalog)
 {
     this->pin = pin;
-    pinMode(pin, INPUT_PULLUP);
+    this->readsAnalog = readsAnalog;
+
+    // No pull-up in analog mode - it would skew the reading.
+    pinMode(pin, readsAnalog ? INPUT : INPUT_PULLUP);
 
     Detected();
 }
 
 bool Infrared::Detected()
 {
+    if (readsAnalog)
+    {
+        level = analogRead(pin);
+        return level >= IR_ANALOG_THRESHOLD;
+    }
+
     level = digitalRead(pin);
     return level == IR_DETECTED;
 }
