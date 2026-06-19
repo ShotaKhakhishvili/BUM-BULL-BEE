@@ -29,6 +29,7 @@
 
 #include "MySrc/close_ir.h"
 #include "MySrc/debug_vars.h"
+#include "MySrc/defines.h"
 #include "MySrc/forward_range.h"
 #include "MySrc/light.h"
 #include "MySrc/magnet.h"
@@ -118,6 +119,16 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FORWARD_MAGNET_TEST 1
 #define APP_FORWARD_TEST_SPEED  255
 
+/* Black-line edge reflex. The two wired light sensors (PB3 = COL2, PB4 = COL4)
+ * watch the arena boundary: on a black line the bot stops, reverses, then spins
+ * in place, then resumes normal movement. Tune the durations/speeds here. Flip
+ * APP_LINE_ROTATE_DIR (ROT_RIGHT/ROT_LEFT) to change which way it turns away. */
+#define APP_LINE_BACKUP_MS      250U
+#define APP_LINE_ROTATE_MS      250U
+#define APP_LINE_BACKUP_SPEED   150
+#define APP_LINE_ROTATE_SPEED   150
+#define APP_LINE_ROTATE_DIR     ROT_RIGHT
+
 typedef enum
 {
     APP_STRATEGY_0 = 0,   /* PB5 == 0: seek / chase / catch (implemented) */
@@ -151,6 +162,8 @@ static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
 static void App_Strategy0_Tick(void);   /* seek / chase / catch */
 static void App_Strategy1_Tick(void);   /* alternate strategy (stub) */
+static bool App_SeesBlackLine(void);    /* PB3/PB4 light sensors on a black line */
+static void App_LineAvoidManeuver(void);/* stop -> reverse -> rotate -> resume   */
 #if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
 static void SensorTest_Run(void);
 #endif
@@ -258,6 +271,15 @@ int main(void)
     }
 #endif
 
+    /* Edge reflex runs above the strategy: a black line under either light
+     * sensor means we are at the arena boundary, so back off and turn away
+     * before any normal driving this tick. */
+    if (App_SeesBlackLine())
+    {
+      App_LineAvoidManeuver();
+    }
+    else
+    {
 #if APP_FORWARD_MAGNET_TEST
     /* Straight-forward bench test: magnet at max, drive forward at max. */
     Magnet_SetStrength(&g_magnet, MAGNET_PWM_PERIOD);
@@ -273,6 +295,7 @@ int main(void)
       App_Strategy0_Tick();
     }
 #endif
+    }
 
     HAL_Delay(5);
   }
@@ -523,6 +546,37 @@ static void App_InitParityGpio(void)
   gpio.Mode = GPIO_MODE_INPUT;
   gpio.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &gpio);
+}
+
+/*
+ * Returns true when either edge light sensor reports a black line:
+ *   PB3 = COL2 = g_fl,  PB4 = COL4 = g_bl.
+ * BBB_BLACK follows the existing Light convention; if a sensor is wired the
+ * other way round, flip its rev flag in the Light_Init loop above.
+ */
+static bool App_SeesBlackLine(void)
+{
+  return (Light_GetCol(&g_fl) == BBB_BLACK) ||
+         (Light_GetCol(&g_bl) == BBB_BLACK);
+}
+
+/*
+ * Black-line reflex: stop, reverse for APP_LINE_BACKUP_MS, then rotate in place
+ * for APP_LINE_ROTATE_MS, then stop. Normal movement resumes on the next loop
+ * tick. This blocks for ~0.5 s, during which nothing else runs - acceptable for
+ * a boundary escape, but see the note if you need sensing to stay live.
+ */
+static void App_LineAvoidManeuver(void)
+{
+  Move_Stop(&move);
+
+  Move_Walk(&move, MOVE_BACKWARD, APP_LINE_BACKUP_SPEED);
+  Platform_DelayMs(APP_LINE_BACKUP_MS);
+
+  Move_RotateOnPoint(&move, APP_LINE_ROTATE_DIR, APP_LINE_ROTATE_SPEED);
+  Platform_DelayMs(APP_LINE_ROTATE_MS);
+
+  Move_Stop(&move);
 }
 
 /*
