@@ -6,6 +6,11 @@
 #define SEEK_AGGRESSIVE_TURN_COEF_THRESHOLD 0.20f
 #define SEEK_AGGRESSIVE_INNER_REVERSE_COEF 0.55f
 
+/* Lower bound for the SlideFwd steering coefficient: the inner wheel always
+ * drives at least this fraction of speed, so a chase turn stays a two-wheel arc
+ * instead of collapsing to a near-one-wheel pivot. */
+#define SEEK_MIN_STEER_COEF 0.4f
+
 /* Validity floor for the side Sharps. The long Sharp reads ~0.44 V at 60 cm, so
  * this must sit below that or targets near the 60 cm see_threshold get clipped
  * before the distance check. It only rejects genuine no-signal/noise now. */
@@ -136,6 +141,13 @@ static void Seek_MoveWithSteer(
     if(direction == SEEK_STEER_RIGHT)
     {
         finalDirection = ROT_RIGHT;
+    }
+
+    /* Keep both wheels meaningfully engaged: never let the inner wheel drop
+     * below SEEK_MIN_STEER_COEF of speed. */
+    if (coef < SEEK_MIN_STEER_COEF)
+    {
+        coef = SEEK_MIN_STEER_COEF;
     }
 
     Move_SlideFwd(move, finalDirection, speed, coef);
@@ -345,12 +357,16 @@ void Seek_Update(
             break;
 
         case 0b100:
-            Seek_MoveWithSteer(move, base_speed, SEEK_STEER_LEFT, rotCoef);
+            /* Target only off to the left, nothing ahead: pivot in place toward
+             * it with both wheels (Move_RotateOnPoint via Seek_Look) instead of
+             * a one-wheel slide. */
+            Seek_Look(self, move, SEEK_STEER_LEFT, base_speed);
             Seek_UpdateDirectionMemory(self, SEEK_STEER_LEFT);
             break;
 
         case 0b001:
-            Seek_MoveWithSteer(move, base_speed, SEEK_STEER_RIGHT, rotCoef);
+            /* Target only off to the right: pivot in place toward it. */
+            Seek_Look(self, move, SEEK_STEER_RIGHT, base_speed);
             Seek_UpdateDirectionMemory(self, SEEK_STEER_RIGHT);
             break;
         
