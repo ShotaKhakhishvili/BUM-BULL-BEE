@@ -110,6 +110,11 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FINISH_PORT     GPIOA
 #define APP_FINISH_PIN      GPIO_PIN_9
 
+/* PA11 - "module active" status output: 1 while the strategy is running, 0 before
+ * the start signal and after a stop/finish signal. */
+#define APP_STATUS_PORT     GPIOA
+#define APP_STATUS_PIN      GPIO_PIN_11
+
 /* PA8 start gate and PA9 finish handling: when 1 the bot stays planted until the
  * start signal (PA8) goes high, then runs the strategy, and halts when the finish
  * signal (PA9) goes high. Set to 0 to run immediately and never auto-halt. */
@@ -267,6 +272,9 @@ int main(void)
   }
 #endif
 
+  /* Module is now active and about to run the strategy: raise the status pin. */
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -282,6 +290,7 @@ int main(void)
      * halt - no further sensing or movement. */
     if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
     {
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
       Move_Stop(&move);
       Magnet_Off(&g_magnet);
       break;
@@ -572,6 +581,14 @@ static void App_InitParityGpio(void)
   gpio.Mode = GPIO_MODE_INPUT;
   gpio.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &gpio);
+
+  /* PA11 = "module active" status output, start low (not yet running). */
+  gpio.Pin = GPIO_PIN_11;
+  gpio.Mode = GPIO_MODE_OUTPUT_PP;
+  gpio.Pull = GPIO_NOPULL;
+  gpio.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &gpio);
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
 }
 
 /*
