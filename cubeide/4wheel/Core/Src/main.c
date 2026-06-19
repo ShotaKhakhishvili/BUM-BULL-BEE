@@ -132,6 +132,10 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_LINE_ROTATE_MS      500U
 #define APP_LINE_ROTATE_SPEED   255
 
+/* Forward distance (cm) at/below which a visible target counts as "catching"
+ * (opponent right in front) rather than "chasing". Drives the magnet policy. */
+#define APP_CATCH_DISTANCE_CM   20.0
+
 typedef enum
 {
     APP_STRATEGY_0 = 0,   /* PB5 == 0: seek / chase / catch (implemented) */
@@ -627,18 +631,25 @@ static void App_Strategy0_Tick(void)
 
   ForwardRange_Update(&g_forward);
 
-  /* Chase whenever a target is visible, otherwise scan. The magnet follows that:
-   * released while scanning (so the bot spins/searches freely) and engaged the
-   * moment we have a target to chase/catch (grip the floor to push). */
-  if (Seek_IsTargetVisible(&g_seek))
+  /* Seek mode: scan when no target, CATCH when the opponent is right in front
+   * (forward distance <= APP_CATCH_DISTANCE_CM), otherwise CHASE. Magnet policy:
+   * grip while SEEKING (planted, stable spin) and CATCHING (clamp to push), but
+   * release while CHASING for a lighter, faster approach. */
+  if (!Seek_IsTargetVisible(&g_seek))
   {
-    g_seek_mode = SEEK_MODE_CHASE;
-    Magnet_Default(&g_magnet);   /* grip while chasing/catching */
+    g_seek_mode = SEEK_MODE_LOOK;
+    Magnet_Default(&g_magnet);   /* grip: stay planted while spinning to search */
+  }
+  else if (ForwardRange_IsValid(&g_forward) &&
+           (ForwardRange_GetDistanceCm(&g_forward) <= APP_CATCH_DISTANCE_CM))
+  {
+    g_seek_mode = SEEK_MODE_CATCH;
+    Magnet_Default(&g_magnet);   /* grip: clamp down to push the opponent out */
   }
   else
   {
-    g_seek_mode = SEEK_MODE_LOOK;
-    Magnet_Off(&g_magnet);       /* release while rotating to search */
+    g_seek_mode = SEEK_MODE_CHASE;
+    Magnet_Off(&g_magnet);       /* release: light and fast while closing in */
   }
 
   Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
