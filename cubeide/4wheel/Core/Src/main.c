@@ -116,19 +116,19 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 /* Temporary bench behaviour: ignore the strategies and just drive straight
  * forward with the electromagnet held at 100. Set to 0 to restore the normal
  * strategy dispatch. */
-#define APP_FORWARD_MAGNET_TEST 1
+#define APP_FORWARD_MAGNET_TEST 0
 #define APP_FORWARD_TEST_SPEED  255
 
-/* Edge reflex. The two wired light sensors (PB3 = COL2, PB4 = COL4) watch the
- * arena boundary: on the trigger color the bot stops, reverses, then spins in
- * place, then resumes normal movement. Tune the durations/speeds here. Flip
- * APP_LINE_ROTATE_DIR (ROT_RIGHT/ROT_LEFT) to change which way it turns away. */
+/* Edge reflex. The two wired light sensors watch the arena boundary: on the
+ * trigger color the bot stops, reverses, then spins away from whichever side hit
+ * the line (left sensor -> rotate right, right sensor -> rotate left), then
+ * resumes. Sensor->side mapping is set in App_SeesLine(); swap it there if the
+ * bot turns the wrong way. Tune the durations/speeds here. */
 #define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
-#define APP_LINE_BACKUP_MS      250U
+#define APP_LINE_BACKUP_MS      500U
 #define APP_LINE_ROTATE_MS      500U
 #define APP_LINE_BACKUP_SPEED   150
 #define APP_LINE_ROTATE_SPEED   150
-#define APP_LINE_ROTATE_DIR     ROT_RIGHT
 
 typedef enum
 {
@@ -163,8 +163,8 @@ static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
 static void App_Strategy0_Tick(void);   /* seek / chase / catch */
 static void App_Strategy1_Tick(void);   /* alternate strategy (stub) */
-static bool App_SeesLine(void);         /* PB3/PB4 light sensors on the trigger color */
-static void App_LineAvoidManeuver(void);/* stop -> reverse -> rotate -> resume   */
+static bool App_SeesLine(bool *rotate_dir);     /* PB3/PB4 on the line; sets turn-away dir */
+static void App_LineAvoidManeuver(bool rotate_dir); /* stop -> reverse -> rotate -> resume */
 #if SENSOR_TEST_SELECT != SENSOR_TEST_NONE
 static void SensorTest_Run(void);
 #endif
@@ -272,12 +272,13 @@ int main(void)
     }
 #endif
 
-    /* Edge reflex runs above the strategy: a black line under either light
-     * sensor means we are at the arena boundary, so back off and turn away
-     * before any normal driving this tick. */
-    if (App_SeesLine())
+    /* Edge reflex runs above the strategy: a line under either light sensor
+     * means we are at the arena boundary, so back off and turn away from the
+     * side that hit it before any normal driving this tick. */
+    bool line_rotate_dir;
+    if (App_SeesLine(&line_rotate_dir))
     {
-      App_LineAvoidManeuver();
+      App_LineAvoidManeuver(line_rotate_dir);
     }
     else
     {
@@ -550,31 +551,44 @@ static void App_InitParityGpio(void)
 }
 
 /*
- * Returns true when either edge light sensor reports the line color:
- *   PB3 = COL2 = g_fl,  PB4 = COL4 = g_bl.
- * The trigger color is APP_LINE_TRIGGER_COLOR - flip that define between
- * BBB_WHITE and BBB_BLACK to reverse which color the bot reacts to.
+ * Returns true when either edge light sensor reports the line color, and sets
+ * *rotate_dir to spin AWAY from the side that hit it:
+ *   left  sensor: PB3 = COL2 = g_fl  -> ROT_RIGHT
+ *   right sensor: PB4 = COL4 = g_bl  -> ROT_LEFT
+ * If both are on the line, defaults to ROT_RIGHT. Swap g_fl/g_bl here if the
+ * physical left/right is reversed. Trigger color is APP_LINE_TRIGGER_COLOR.
  */
-static bool App_SeesLine(void)
+static bool App_SeesLine(bool *rotate_dir)
 {
-  return (Light_GetCol(&g_fl) == APP_LINE_TRIGGER_COLOR) ||
-         (Light_GetCol(&g_bl) == APP_LINE_TRIGGER_COLOR);
+  bool left_on_line  = (Light_GetCol(&g_fl) == APP_LINE_TRIGGER_COLOR);
+  bool right_on_line = (Light_GetCol(&g_bl) == APP_LINE_TRIGGER_COLOR);
+
+  if (!left_on_line && !right_on_line)
+  {
+    return false;
+  }
+
+  if (rotate_dir != 0)
+  {
+    *rotate_dir = left_on_line ? ROT_RIGHT : ROT_LEFT;
+  }
+  return true;
 }
 
 /*
- * Black-line reflex: stop, reverse for APP_LINE_BACKUP_MS, then rotate in place
- * for APP_LINE_ROTATE_MS, then stop. Normal movement resumes on the next loop
- * tick. This blocks for ~0.5 s, during which nothing else runs - acceptable for
- * a boundary escape, but see the note if you need sensing to stay live.
+ * Line reflex: stop, reverse for APP_LINE_BACKUP_MS, then rotate in place for
+ * APP_LINE_ROTATE_MS in rotate_dir, then stop. Normal movement resumes on the
+ * next loop tick. This blocks for ~1 s, during which nothing else runs -
+ * acceptable for a boundary escape, but see the note if you need sensing live.
  */
-static void App_LineAvoidManeuver(void)
+static void App_LineAvoidManeuver(bool rotate_dir)
 {
   Move_Stop(&move);
 
   Move_Walk(&move, MOVE_BACKWARD, APP_LINE_BACKUP_SPEED);
   Platform_DelayMs(APP_LINE_BACKUP_MS);
 
-  Move_RotateOnPoint(&move, APP_LINE_ROTATE_DIR, APP_LINE_ROTATE_SPEED);
+  Move_RotateOnPoint(&move, rotate_dir, APP_LINE_ROTATE_SPEED);
   Platform_DelayMs(APP_LINE_ROTATE_MS);
 
   Move_Stop(&move);
