@@ -192,7 +192,7 @@ static float Seek_CalcualteRotationCoefficient(
     if(!sees_middle)
         return 0.05f;
 
-    return 0.1f;
+    return 0.85f;
 }
 
 void Seek_Init(Seek *self)
