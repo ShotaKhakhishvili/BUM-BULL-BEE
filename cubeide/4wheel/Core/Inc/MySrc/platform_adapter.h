@@ -23,15 +23,10 @@
 #define PLATFORM_ADC_IDX_IR_L 2U /* PA6 / ADC1_IN6 */
 #endif
 
-#ifndef PLATFORM_ADC_IDX_IR_CLOSE_A
-#define PLATFORM_ADC_IDX_IR_CLOSE_A 0U /* PA4 / ADC1_IN4 (moved off PA1, now the magnet) */
-#endif
-
 uint32_t Platform_Millis(void);
 uint16_t Platform_ReadIrMAdc(void);
 uint16_t Platform_ReadIrRAdc(void);
 uint16_t Platform_ReadIrLAdc(void);
-uint16_t Platform_ReadIrCloseAdc(void);
 
 void Platform_DebugPrintMedians(double short_median, double long_median, uint8_t digits_after_decimal);
 

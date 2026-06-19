@@ -1,4 +1,3 @@
-"./Core/Src/MySrc/close_ir.o"
 "./Core/Src/MySrc/debug_vars.o"
 "./Core/Src/MySrc/forward_range.o"
 "./Core/Src/MySrc/light.o"

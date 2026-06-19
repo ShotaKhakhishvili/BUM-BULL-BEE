@@ -1,24 +1,20 @@
 #include "MySrc/forward_range.h"
 
 /*
- * Switching policy (no blending): the ToF only ranges to ~20 cm, so it owns the
- * near field and the Sharp owns everything beyond. The crossover uses hysteresis
- * with a 3 cm dead-band to stop chatter when the target hovers near it:
+ * Switching policy (no blending), keyed on the ToF reading: the ToF owns the
+ * near field and the Sharp owns everything beyond a single crossover:
  *
- *   - while the Sharp is active: drop to the ToF once the distance falls below
- *     FR_SWITCH_TO_TOF_CM (13 cm).
- *   - while the ToF is active: climb back to the Sharp once the distance rises
- *     above FR_SWITCH_TO_SHARP_CM (16 cm).
+ *   - ToF reads under FR_TOF_NEAR_CM (18 cm)  -> use the ToF.
+ *   - ToF reads at/above 18 cm, or drops out  -> use the Sharp.
  *
- * Either way, if the active sensor is unusable we fall back to the other one; if
- * neither is usable we hold the last value and clear valid. On the ToF, a reading
- * below FR_TOF_MIN_CM (~2 cm) is point-blank and reported as 0 ("too close to
- * measure") rather than a misleading number.
+ * If the chosen sensor is unusable we fall back to the other one; if neither is
+ * usable we hold the last value and clear valid. On the ToF, a reading below
+ * FR_TOF_MIN_CM (~2 cm) is point-blank and reported as 0 ("too close to measure")
+ * rather than a misleading number.
  */
 #define FR_TOF_MIN_CM           2.0   /* below this the ToF can't be trusted -> report 0 */
+#define FR_TOF_NEAR_CM         18.0   /* ToF owns < 18 cm; hand off to the Sharp at/above it */
 #define FR_SHARP_MIN_CM         8.0   /* Sharp is monotonic at/above this (near fold-back below) */
-#define FR_SWITCH_TO_TOF_CM    13.0   /* on Sharp: drop to ToF below this */
-#define FR_SWITCH_TO_SHARP_CM  16.0   /* on ToF: climb to Sharp above this */
 #define FR_SHARP_VALID_VOLT    0.43   /* mirrors Seek's SEEK_SEE_MIN_VOLT (see ~60 cm) */
 #define FR_SHARP_MAX_CM       150.0   /* Sharp practical reach */
 
@@ -77,59 +73,31 @@ void ForwardRange_Update(ForwardRange *self)
     sharp_cm = SharpManager_GetDistance(self->sharp, SHARP_SENSOR_MIDDLE);
     sharp_ok = ForwardRange_SharpValid(self->sharp, sharp_cm);
 
-    /* Advance the hysteresis state machine using the active sensor's distance. */
+    /* Use the ToF only while it reports inside the near field (< 18 cm); past
+     * that, or if it drops out, the Sharp takes over. */
+    self->using_tof = tof_ok && (tof_cm < FR_TOF_NEAR_CM);
+
     if (self->using_tof)
     {
-        /* On the ToF: climb back to the Sharp once we're clearly past 16 cm,
-         * or whenever the ToF reading drops out and the Sharp is usable. */
-        if ((!tof_ok || (tof_cm > FR_SWITCH_TO_SHARP_CM)) && sharp_ok)
-        {
-            self->using_tof = false;
-        }
-    }
-    else
-    {
-        /* On the Sharp: drop to the ToF once we fall below 13 cm, or whenever
-         * the Sharp reading drops out and the ToF is usable. */
-        if ((!sharp_ok || (sharp_cm < FR_SWITCH_TO_TOF_CM)) && tof_ok)
-        {
-            self->using_tof = true;
-        }
+        /* Point-blank: too close for either sensor -> report 0. */
+        self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
+        self->valid = true;
+        return;
     }
 
-    /* Emit the active sensor, falling back to the other if it is unusable. */
-    if (self->using_tof)
+    if (sharp_ok)
     {
-        if (tof_ok)
-        {
-            /* Point-blank: too close for either sensor -> report 0. */
-            self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
-            self->valid = true;
-            return;
-        }
-
-        if (sharp_ok)
-        {
-            self->fused_cm = sharp_cm;
-            self->valid = true;
-            return;
-        }
+        self->fused_cm = sharp_cm;
+        self->valid = true;
+        return;
     }
-    else
-    {
-        if (sharp_ok)
-        {
-            self->fused_cm = sharp_cm;
-            self->valid = true;
-            return;
-        }
 
-        if (tof_ok)
-        {
-            self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
-            self->valid = true;
-            return;
-        }
+    /* Sharp unusable -> fall back to the ToF even past the threshold. */
+    if (tof_ok)
+    {
+        self->fused_cm = (tof_cm < FR_TOF_MIN_CM) ? 0.0 : tof_cm;
+        self->valid = true;
+        return;
     }
 
     /* Neither source usable -> hold last value, flag invalid. */

@@ -139,11 +139,6 @@ uint16_t Platform_ReadIrLAdc(void)
     return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_L);
 }
 
-uint16_t Platform_ReadIrCloseAdc(void)
-{
-    return Platform_ReadAdcByIndex(PLATFORM_ADC_IDX_IR_CLOSE_A);
-}
-
 void Platform_DebugPrintMedians(double short_median, double long_median, uint8_t digits_after_decimal)
 {
     char short_buffer[24];

@@ -27,7 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "MySrc/close_ir.h"
 #include "MySrc/debug_vars.h"
 #include "MySrc/defines.h"
 #include "MySrc/forward_range.h"
@@ -83,7 +82,6 @@ volatile uint16_t adc_raw[4] = {0};
 static SharpManager g_sharp_manager;
 static Vl53l0x g_tof;
 static ForwardRange g_forward;
-static CloseIR g_close_ir;
 static MedianCalculator g_median_calculator;
 static Move move;
 static Seek g_seek;
@@ -232,7 +230,6 @@ int main(void)
   SharpManager_Init(&g_sharp_manager);
   Vl53l0x_Init(&g_tof);
   ForwardRange_Init(&g_forward, &g_tof, &g_sharp_manager);
-  CloseIR_Init(&g_close_ir);
   MedianCalculator_Init(&g_median_calculator);
   Move_Init(&move);
   Seek_Init(&g_seek);
@@ -598,28 +595,14 @@ static void App_Strategy0_Tick(void)
 {
   SharpManager_Update(&g_sharp_manager);
   Vl53l0x_Update(&g_tof);
-  CloseIR_Update(&g_close_ir);
 
   ForwardRange_Update(&g_forward);
 
-  if (Seek_IsTargetVisible(&g_seek))
-  {
-    g_seek_mode = CloseIR_SeesObject(&g_close_ir) ? SEEK_MODE_CATCH : SEEK_MODE_CHASE;
-  }
-  else
-  {
-    g_seek_mode = SEEK_MODE_LOOK;
-  }
+  /* Chase whenever a target is visible, otherwise scan. */
+  g_seek_mode = Seek_IsTargetVisible(&g_seek) ? SEEK_MODE_CHASE : SEEK_MODE_LOOK;
 
-  /* Clamp down harder when an opponent is right in front, otherwise just hold. */
-  if (CloseIR_SeesObject(&g_close_ir))
-  {
-    Magnet_Close(&g_magnet);
-  }
-  else
-  {
-    Magnet_Default(&g_magnet);
-  }
+  /* Magnet (PA1, on/off) stays energized to hold the chassis down. */
+  Magnet_Default(&g_magnet);
 
   Seek_Update(&g_seek, g_seek_mode, &move, &g_forward, &g_sharp_manager);
   Move_Update(&move);
@@ -628,7 +611,7 @@ static void App_Strategy0_Tick(void)
 /*
  * Strategy 1 (PB5 == 1): alternate strategy.
  * TODO: implement the second behaviour here. Runs every ~5 ms while the match
- * is active. The shared modules (g_sharp_manager, g_tof, g_forward, g_close_ir,
+ * is active. The shared modules (g_sharp_manager, g_tof, g_forward,
  * g_seek, move, g_magnet) are available exactly as in App_Strategy0_Tick.
  */
 static void App_Strategy1_Tick(void)
