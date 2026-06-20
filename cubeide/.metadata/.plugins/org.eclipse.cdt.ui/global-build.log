@@ -67,3 +67,52 @@ arm-none-eabi-size  4wheel.elf
   32884	     32	   4056	  36972	   906c	4wheel.elf
 Finished building: default.size.stdout
  
+10:33:12 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:33:47 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:34:25 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:34:58 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:36:06 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:36:59 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 
+10:37:28 **** Incremental Build of configuration Debug for project 4wheel ****
+make -j16 all 
+arm-none-eabi-size  4wheel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32884	     32	   4056	  36972	   906c	4wheel.elf
+Finished building: default.size.stdout
+ 

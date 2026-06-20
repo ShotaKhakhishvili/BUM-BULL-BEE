@@ -1,4 +1,4 @@
-10:32:26 **** Incremental Build of configuration Debug for project 4wheel ****
+10:37:28 **** Incremental Build of configuration Debug for project 4wheel ****
 make -j16 all 
 arm-none-eabi-size  4wheel.elf 
    text	   data	    bss	    dec	    hex	filename
@@ -6,5 +6,5 @@ arm-none-eabi-size  4wheel.elf
 Finished building: default.size.stdout
  
 
-10:32:26 Build Finished. 0 errors, 0 warnings. (took 271ms)
+10:37:28 Build Finished. 0 errors, 0 warnings. (took 283ms)
 
