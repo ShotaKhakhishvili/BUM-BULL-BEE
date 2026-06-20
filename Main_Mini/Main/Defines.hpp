@@ -59,8 +59,8 @@
 
 // Start/stop signal lines. WARNING: STOP is on D1, the UART TX pin - it
 // can't be read reliably while Serial is active.
-#define START_PIN     12     // D2 - INT0
-#define STOP_PIN      13    // D1 - PCINT17
+#define START_PIN     12   
+#define STOP_PIN      13    
 
 // Active indicator: HIGH while running, LOW while stopped.
 #define INDICATOR     11     // TODO: set to an available digital output pin
