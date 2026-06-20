@@ -100,14 +100,14 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
 /* Match control signals (all active-high level inputs, stable from power-up):
  *   PB5 - strategy select, latched once at boot (0 -> strategy 0, 1 -> strategy 1)
- *   PA8 - start: the match begins when this reads 1
- *   PA9 - finish: the match ends (stop + magnets off) when this reads 1 */
+ *   PA9 - start: the match begins when this reads 1
+ *   PA8 - finish: the match ends (stop + magnets off) when this reads 1 */
 #define APP_STRATEGY_PORT   GPIOB
 #define APP_STRATEGY_PIN    GPIO_PIN_5
 #define APP_START_PORT      GPIOA
-#define APP_START_PIN       GPIO_PIN_8
+#define APP_START_PIN       GPIO_PIN_9
 #define APP_FINISH_PORT     GPIOA
-#define APP_FINISH_PIN      GPIO_PIN_9
+#define APP_FINISH_PIN      GPIO_PIN_8
 
 /* PA11 - "module active" status output: driven to the ACTIVE level while the
  * strategy runs, and to the INACTIVE level before start and after a stop/finish.
