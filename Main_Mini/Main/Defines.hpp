@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#define LED  13
+#define LED  5
 
 // Debug
 
@@ -12,13 +12,13 @@
 
 // ------------------- DISTANCE SENSORS ----------------------
 
-#define SHARP_PIN       A3      // Sharp GP2Y0A21 analog out
+#define SHARP_PIN       A1      // Sharp GP2Y0A21 analog out
 
 // IR mode: false = digital modules on D7/D8, true = analog on A0/A1.
 #define IR_READS_ANALOG false
 
-#define IR1             7       // D7 - digital IR sensor
-#define IR2             8       // D8 - digital IR sensor
+#define IR1             2       // D7 - digital IR sensor
+#define IR2             3       // D8 - digital IR sensor
 
 #define IR1_ANALOG      A0      // analog IR sensor
 #define IR2_ANALOG      A1      // analog IR sensor
@@ -47,23 +47,23 @@
 // Each motor: one PWM (speed) pin + two direction pins.
 // NOTE: STBY must be tied HIGH (to VCC) to enable the driver.
 
-#define PWMA          3     // D3  - Motor A speed (PWM)
-#define AIN1          12    // D12 - Motor A direction
-#define AIN2          4     // D4  - Motor A direction
+#define PWMA          9     // D3  - Motor A speed (PWM)
+#define AIN1           8   // D12 - Motor A direction
+#define AIN2          7    // D4  - Motor A direction
 
-#define PWMB          9     // D9  - Motor B speed (PWM)
-#define BIN1          A2    // Motor B direction
-#define BIN2          A1    // Motor B direction
+#define PWMB          10     // D9  - Motor B speed (PWM)
+#define BIN1          6    // Motor B direction
+#define BIN2          5    // Motor B direction
 
 // -------------------- OTHERS -------------------------------
 
 // Start/stop signal lines. WARNING: STOP is on D1, the UART TX pin - it
 // can't be read reliably while Serial is active.
-#define START_PIN     2     // D2 - INT0
-#define STOP_PIN      1     // D1 - PCINT17
+#define START_PIN     12     // D2 - INT0
+#define STOP_PIN      13    // D1 - PCINT17
 
 // Active indicator: HIGH while running, LOW while stopped.
-#define INDICATOR     0     // TODO: set to an available digital output pin
+#define INDICATOR     11     // TODO: set to an available digital output pin
 
 #define RESET         13
 

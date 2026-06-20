@@ -1,6 +1,7 @@
 "./Core/Src/MySrc/debug_vars.o"
 "./Core/Src/MySrc/forward_range.o"
 "./Core/Src/MySrc/light.o"
+"./Core/Src/MySrc/magnet.o"
 "./Core/Src/MySrc/median_calculator.o"
 "./Core/Src/MySrc/move.o"
 "./Core/Src/MySrc/platform_adapter.o"
