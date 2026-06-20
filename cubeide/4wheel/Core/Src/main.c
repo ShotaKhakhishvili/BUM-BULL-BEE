@@ -161,6 +161,14 @@ typedef enum
 
 static volatile AppStrategy g_strategy = APP_STRATEGY_0;
 
+/* Latched run state for the start/stop logic: start once, stop once, no restart. */
+typedef enum
+{
+    RUN_IDLE = 0,     /* waiting for the start signal (PA8) */
+    RUN_ACTIVE = 1,   /* started: running the strategy */
+    RUN_STOPPED = 2   /* stopped (PA9) for good - a later start is ignored */
+} RunState;
+
 static Light *g_lights[4] =
 {
   &g_fr,
@@ -274,18 +282,13 @@ int main(void)
   }
 
 #if APP_USE_START_FINISH_SIGNALS
-  /* Start gate: stay planted (motors stopped, magnet engaged) until the start
-   * signal goes high on PA8, so the bot never moves before the match begins. */
-  Move_Stop(&move);
-  Magnet_Default(&g_magnet);
-  while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_RESET)
-  {
-    /* wait for start */
-  }
-#endif
-
-  /* Module is now active and about to run the strategy: drive the status pin. */
+  /* Latched start/stop: begin IDLE (PA11 already low from App_InitParityGpio).
+   * The loop raises PA11 and runs once PA8 is pressed, and latches off on PA9. */
+  RunState run_state = RUN_IDLE;
+#else
+  /* No start/stop gating: the module is active immediately. */
   HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+#endif
 
   /* USER CODE END 2 */
 
@@ -298,14 +301,34 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 #if APP_USE_START_FINISH_SIGNALS
-    /* Finish: PA9 high ends the match. Stop driving, release the magnets, and
-     * halt - no further sensing or movement. */
-    if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
+    /* Latched start/stop. PA8 starts the run once; PA9 stops it for good. While
+     * IDLE we only watch for start; while ACTIVE we only watch for stop; once
+     * STOPPED nothing restarts it. So a second start press has no effect, and a
+     * start press after a stop is ignored. */
+    if (run_state == RUN_IDLE)
     {
-      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+      if (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_SET)
+      {
+        run_state = RUN_ACTIVE;
+        HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+      }
+    }
+    else if (run_state == RUN_ACTIVE)
+    {
+      if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
+      {
+        run_state = RUN_STOPPED;
+        HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+      }
+    }
+
+    if (run_state != RUN_ACTIVE)
+    {
+      /* Idle (pre-start) or stopped (terminal): hold still and skip the strategy. */
       Move_Stop(&move);
       Magnet_Off(&g_magnet);
-      break;
+      HAL_Delay(5);
+      continue;
     }
 #endif
 
@@ -338,15 +361,6 @@ int main(void)
 
     HAL_Delay(5);
   }
-
-#if APP_USE_START_FINISH_SIGNALS
-  /* Match finished (PA9): remain stopped and de-energized for good. */
-  Move_Stop(&move);
-  Magnet_Off(&g_magnet);
-  while (1)
-  {
-  }
-#endif
   /* USER CODE END 3 */
 }
 
