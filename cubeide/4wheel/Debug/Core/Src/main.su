@@ -1,10 +1,9 @@
-../Core/Src/main.c:211:5:main	16	static
+../Core/Src/main.c:194:5:main	16	static
 ../Core/Src/main.c:345:6:SystemClock_Config	88	static
 ../Core/Src/main.c:528:13:MX_USART1_UART_Init	40	static
 ../Core/Src/main.c:557:13:App_InitParityGpio	32	static
-../Core/Src/main.c:600:6:HAL_GPIO_EXTI_Callback	16	static
-../Core/Src/main.c:627:13:App_SeesLine	24	static
-../Core/Src/main.c:651:13:App_LineAvoidManeuver	16	static
-../Core/Src/main.c:669:13:App_Strategy0_Tick	16	static
-../Core/Src/main.c:707:13:App_Strategy1_Tick	8	static
-../Core/Src/main.c:720:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:602:13:App_SeesLine	24	static
+../Core/Src/main.c:626:13:App_LineAvoidManeuver	16	static
+../Core/Src/main.c:644:13:App_Strategy0_Tick	16	static
+../Core/Src/main.c:682:13:App_Strategy1_Tick	8	static
+../Core/Src/main.c:695:6:Error_Handler	4	static,ignoring_inline_asm

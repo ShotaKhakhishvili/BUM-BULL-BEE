@@ -77,10 +77,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/* Length MUST match the ADC's NbrOfConversion (3: IN2,IN6,IN7 = PA2,PA6,PA7).
- * A mismatched circular buffer makes the channels rotate through the slots and
- * scrambles every Sharp reading. Slots: [0]=PA2 IR_M, [1]=PA6 IR_L, [2]=PA7 IR_R. */
-volatile uint16_t adc_raw[3] = {0};
+/* Length MUST match the ADC's NbrOfConversion (5: IN1,IN2,IN3,IN6,IN7 =
+ * PA1,PA2,PA3,PA6,PA7). A shorter circular buffer makes the channels rotate
+ * through the slots and scrambles every Sharp reading. Slots: [0]=PA1 (magnet,
+ * unused), [1]=PA2 IR_M, [2]=PA3 (unused), [3]=PA6 IR_L, [4]=PA7 IR_R. */
+volatile uint16_t adc_raw[5] = {0};
 
 static SharpManager g_sharp_manager;
 static Vl53l0x g_tof;
@@ -98,11 +99,10 @@ static Light g_bl;
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
-/* Match control signals (active-high level inputs, polled - the design that
- * worked before the interrupt rewrite):
+/* Match control signals (all active-high level inputs, stable from power-up):
  *   PB5 - strategy select, latched once at boot (0 -> strategy 0, 1 -> strategy 1)
- *   PA8 - start: the match begins the first time this reads 1
- *   PA9 - finish: the match ends (stop + magnets off, for good) when this reads 1 */
+ *   PA8 - start: the match begins when this reads 1
+ *   PA9 - finish: the match ends (stop + magnets off) when this reads 1 */
 #define APP_STRATEGY_PORT   GPIOB
 #define APP_STRATEGY_PIN    GPIO_PIN_5
 #define APP_START_PORT      GPIOA
@@ -110,31 +110,20 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FINISH_PORT     GPIOA
 #define APP_FINISH_PIN      GPIO_PIN_9
 
-/* PA11 - "module active" status output: driven to the ACTIVE level while the
- * strategy runs, and to the INACTIVE level before start and after a stop/finish.
- * APP_STATUS_ACTIVE_HIGH picks the polarity so it works either way it's wired:
- *   1 -> PA11 high when active  (LED to GND:  PA11 -> R -> LED -> GND)
- *   0 -> PA11 low  when active  (LED to VCC:  3V3 -> LED -> R -> PA11) */
-#define APP_STATUS_PORT          GPIOA
-#define APP_STATUS_PIN           GPIO_PIN_11
-#define APP_STATUS_ACTIVE_HIGH   0
+/* PA11 - "module active" status output: 1 while the strategy is running, 0 before
+ * the start signal and after a stop/finish signal. */
+#define APP_STATUS_PORT     GPIOA
+#define APP_STATUS_PIN      GPIO_PIN_11
 
-#if APP_STATUS_ACTIVE_HIGH
-#define APP_STATUS_ON_STATE      GPIO_PIN_SET
-#define APP_STATUS_OFF_STATE     GPIO_PIN_RESET
-#else
-#define APP_STATUS_ON_STATE      GPIO_PIN_RESET
-#define APP_STATUS_OFF_STATE     GPIO_PIN_SET
-#endif
-
-/* Start/finish gating: when 1 the bot stays planted until the PA8 start signal
- * goes high, then runs, and halts for good when the PA9 finish signal goes high.
- * Set to 0 to run immediately and never auto-halt. */
+/* PA8 start gate and PA9 finish handling: when 1 the bot stays planted until the
+ * start signal (PA8) goes high, then runs the strategy, and halts when the finish
+ * signal (PA9) goes high. Set to 0 to run immediately and never auto-halt. */
 #define APP_USE_START_FINISH_SIGNALS 1
 
-/* Start/stop bring-up: when running, just drive straight forward (magnet held)
- * instead of the seek strategy. Set to 0 to restore the normal strategy dispatch. */
-#define APP_FORWARD_MAGNET_TEST 1
+/* Temporary bench behaviour: ignore the strategies and just drive straight
+ * forward with the electromagnet held at 100. Set to 0 to restore the normal
+ * strategy dispatch. */
+#define APP_FORWARD_MAGNET_TEST 0
 #define APP_FORWARD_TEST_SPEED  255
 
 /* Edge reflex. The two wired light sensors watch the arena boundary: on the
@@ -142,7 +131,7 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * whichever side hit it (left sensor -> rotate right, right sensor -> rotate
  * left), then resumes. Sensor->side mapping is set in App_SeesLine(); swap it
  * there if the bot turns the wrong way. Tune the durations/speeds here. */
-#define APP_LINE_TRIGGER_COLOR  BBB_WHITE   /* color that counts as "the line"; flip to BBB_BLACK */
+#define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
 #define APP_LINE_BACKUP_MS      500U
 #define APP_LINE_BACKUP_SPEED   255
 #define APP_LINE_ROTATE_MS      500U
@@ -241,7 +230,7 @@ int main(void)
   SensorTest_Run();   /* never returns */
 #endif
 
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 3) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -273,10 +262,8 @@ int main(void)
   }
 
 #if APP_USE_START_FINISH_SIGNALS
-  /* Start gate: stay planted (motors stopped, magnet engaged) until the PA8
-   * start signal reads high, so the bot never moves before the match begins.
-   * Once past this gate the start signal is never read again, so pressing start
-   * a second time has no effect. */
+  /* Start gate: stay planted (motors stopped, magnet engaged) until the start
+   * signal goes high on PA8, so the bot never moves before the match begins. */
   Move_Stop(&move);
   Magnet_Default(&g_magnet);
   while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_RESET)
@@ -285,8 +272,8 @@ int main(void)
   }
 #endif
 
-  /* Module is now active and about to run: drive the status pin to ON. */
-  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+  /* Module is now active and about to run the strategy: raise the status pin. */
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_SET);
 
   /* USER CODE END 2 */
 
@@ -299,12 +286,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 #if APP_USE_START_FINISH_SIGNALS
-    /* Finish: PA9 high ends the match for good. Stop driving, release the
-     * magnets, drop the status pin, and break out to the permanent halt below -
-     * after this the bot can no longer be restarted (latched) without a reset. */
+    /* Finish: PA9 high ends the match. Stop driving, release the magnets, and
+     * halt - no further sensing or movement. */
     if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
     {
-      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
       Move_Stop(&move);
       Magnet_Off(&g_magnet);
       break;
@@ -342,8 +328,7 @@ int main(void)
   }
 
 #if APP_USE_START_FINISH_SIGNALS
-  /* Match finished (PA9): remain stopped and de-energized for good. A later
-   * start signal cannot restart the bot - only a reset/power-cycle does. */
+  /* Match finished (PA9): remain stopped and de-energized for good. */
   Move_Stop(&move);
   Magnet_Off(&g_magnet);
   while (1)
@@ -470,8 +455,8 @@ static SharpManager s_sharp_test;
 static void SensorTest_Run(void)
 {
   /* Start the ADC scan into adc_raw[] (DMA, circular). Length must match the
-   * ADC's NbrOfConversion (3); see the note on adc_raw[] for the slot map. */
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 3) != HAL_OK)
+   * ADC's NbrOfConversion (5); see the note on adc_raw[] for the slot map. */
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -603,7 +588,7 @@ static void App_InitParityGpio(void)
   gpio.Pull = GPIO_NOPULL;
   gpio.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &gpio);
-  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
 }
 
 /*
