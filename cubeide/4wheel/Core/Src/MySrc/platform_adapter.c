@@ -215,6 +215,16 @@ void Platform_WheelSetPwm(uint8_t output, uint16_t strength_8bit)
     }
 }
 
+/* PA1 level that ENERGIZES the magnet. Depends on the build, selected by PB5:
+ * implementation 0 (PB5 low) energizes high; the second implementation (PB5 high)
+ * is wired in reverse, so it energizes low. Latched in Platform_MagnetStartPwm. */
+static GPIO_PinState s_magnet_on_state = GPIO_PIN_SET;
+
+static GPIO_PinState Platform_MagnetOffState(void)
+{
+    return (s_magnet_on_state == GPIO_PIN_SET) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+}
+
 void Platform_MagnetStartPwm(void)
 {
     /* The magnet is now driven as a plain on/off GPIO on PA1 (no PWM). Configure
@@ -224,7 +234,12 @@ void Platform_MagnetStartPwm(void)
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+    /* Pick the energize polarity from the build-select pin PB5: high = the
+     * reverse-wired second implementation (energize low), else energize high. */
+    s_magnet_on_state = (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == GPIO_PIN_SET)
+                            ? GPIO_PIN_RESET : GPIO_PIN_SET;
+
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, Platform_MagnetOffState());
 
     gpio.Pin = GPIO_PIN_1;
     gpio.Mode = GPIO_MODE_OUTPUT_PP;
@@ -236,8 +251,10 @@ void Platform_MagnetStartPwm(void)
 void Platform_MagnetSetCompare(uint16_t compare)
 {
     /* On/off control: any non-zero strength energizes the magnet, zero releases
-     * it. The DEFAULT and CLOSE strength levels therefore both map to "on". */
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, (compare > 0U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+     * it. The DEFAULT and CLOSE strength levels therefore both map to "on". The
+     * drive level is polarity-corrected per build (see s_magnet_on_state). */
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1,
+                      (compare > 0U) ? s_magnet_on_state : Platform_MagnetOffState());
 }
 
 bool Platform_ReadDigitalInput(uint8_t input_id)
