@@ -77,11 +77,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/* Length MUST match the ADC's NbrOfConversion (5: IN1,IN2,IN3,IN6,IN7 =
- * PA1,PA2,PA3,PA6,PA7). A shorter circular buffer makes the channels rotate
- * through the slots and scrambles every Sharp reading. Slots: [0]=PA1 (magnet,
- * unused), [1]=PA2 IR_M, [2]=PA3 (unused), [3]=PA6 IR_L, [4]=PA7 IR_R. */
-volatile uint16_t adc_raw[5] = {0};
+/* Length MUST match the ADC's NbrOfConversion (3: IN2,IN6,IN7 = PA2,PA6,PA7).
+ * A mismatched circular buffer makes the channels rotate through the slots and
+ * scrambles every Sharp reading. Slots: [0]=PA2 IR_M, [1]=PA6 IR_L, [2]=PA7 IR_R. */
+volatile uint16_t adc_raw[3] = {0};
 
 static SharpManager g_sharp_manager;
 static Vl53l0x g_tof;
@@ -250,7 +249,7 @@ int main(void)
   SensorTest_Run();   /* never returns */
 #endif
 
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -481,8 +480,8 @@ static SharpManager s_sharp_test;
 static void SensorTest_Run(void)
 {
   /* Start the ADC scan into adc_raw[] (DMA, circular). Length must match the
-   * ADC's NbrOfConversion (5); see the note on adc_raw[] for the slot map. */
-  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 5) != HAL_OK)
+   * ADC's NbrOfConversion (3); see the note on adc_raw[] for the slot map. */
+  if (HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw, 3) != HAL_OK)
   {
     Error_Handler();
   }

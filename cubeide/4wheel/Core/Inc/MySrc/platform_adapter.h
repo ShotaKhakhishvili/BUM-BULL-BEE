@@ -5,23 +5,22 @@
 #include <stdint.h>
 
 #ifndef PLATFORM_ADC_CHANNEL_COUNT
-#define PLATFORM_ADC_CHANNEL_COUNT 5U
+#define PLATFORM_ADC_CHANNEL_COUNT 3U
 #endif
 
 /* These indices are slots in adc_raw[], which mirrors the ADC scan order
- * rank1..5 = IN1,IN2,IN3,IN6,IN7 = PA1,PA2,PA3,PA6,PA7. Slot 0 (PA1, magnet)
- * and 2 (PA3, unused) are skipped; the Sharps live at 1, 3, 4. */
+ * rank1..3 = IN2,IN6,IN7 = PA2,PA6,PA7. */
 
 #ifndef PLATFORM_ADC_IDX_IR_M
-#define PLATFORM_ADC_IDX_IR_M 1U /* PA2 / ADC1_IN2 */
+#define PLATFORM_ADC_IDX_IR_M 0U /* PA2 / ADC1_IN2 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_R
-#define PLATFORM_ADC_IDX_IR_R 4U /* PA7 / ADC1_IN7 */
+#define PLATFORM_ADC_IDX_IR_R 2U /* PA7 / ADC1_IN7 */
 #endif
 
 #ifndef PLATFORM_ADC_IDX_IR_L
-#define PLATFORM_ADC_IDX_IR_L 3U /* PA6 / ADC1_IN6 */
+#define PLATFORM_ADC_IDX_IR_L 1U /* PA6 / ADC1_IN6 */
 #endif
 
 uint32_t Platform_Millis(void);
