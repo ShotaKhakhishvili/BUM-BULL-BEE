@@ -28,13 +28,12 @@ void setup()
 
 void loop()
 {
-    if(RunState::IsRunning())
-        Move::Walk(FORWARD, 200);
-    else
+    if(!RunState::IsRunning())
+    {
         Move::Walk(FORWARD, 0);
+        return;
+    }
 
-    // --- normal behavior disabled for start test ---
-    /*
     double front = range.Distance();
 
     Behavior::Update(front);
@@ -52,5 +51,4 @@ void loop()
 
         lastDebugPrint = millis();
     }
-    */
 }
