@@ -65,16 +65,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /* PA8 = single start/stop line from the start module: HIGH = run, LOW = stop.
-   * Polled as a plain level input in the main loop (no EXTI). Pull-down so a
-   * disconnected line reads LOW (stopped) and the bot stays planted. */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* PA9 = unused spare input (was the old second start/stop signal). */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  /* PA8 = start signal, PA9 = finish signal. Both are active-high level inputs
+   * polled in the main loop (no EXTI - the interrupt version double-triggered
+   * and latched stop on its own). Pull-down so a disconnected line reads LOW
+   * (not asserted): the bot won't start on its own and won't false-stop. */
+  GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);

@@ -233,8 +233,8 @@ void DMA1_Channel5_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-  /* Start/stop is now polled as a level on PA8 (see App_UpdateRunState in
-   * main.c); PA8/PA9 are plain inputs, so there is no EXTI work to do here. */
+  /* Start (PA8) and finish (PA9) are polled as levels in main(); both are plain
+   * inputs with EXTI disabled, so there is no interrupt work to do here. */
   /* USER CODE END EXTI9_5_IRQn 0 */
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
