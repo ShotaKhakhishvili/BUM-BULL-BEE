@@ -110,10 +110,22 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_FINISH_PORT     GPIOA
 #define APP_FINISH_PIN      GPIO_PIN_9
 
-/* PA11 - "module active" status output: 1 while the strategy is running, 0 before
- * the start signal and after a stop/finish signal. */
-#define APP_STATUS_PORT     GPIOA
-#define APP_STATUS_PIN      GPIO_PIN_11
+/* PA11 - "module active" status output: driven to the ACTIVE level while the
+ * strategy runs, and to the INACTIVE level before start and after a stop/finish.
+ * APP_STATUS_ACTIVE_HIGH picks the polarity so it works either way it's wired:
+ *   1 -> PA11 high when active  (LED to GND:  PA11 -> R -> LED -> GND)
+ *   0 -> PA11 low  when active  (LED to VCC:  3V3 -> LED -> R -> PA11) */
+#define APP_STATUS_PORT          GPIOA
+#define APP_STATUS_PIN           GPIO_PIN_11
+#define APP_STATUS_ACTIVE_HIGH   1
+
+#if APP_STATUS_ACTIVE_HIGH
+#define APP_STATUS_ON_STATE      GPIO_PIN_SET
+#define APP_STATUS_OFF_STATE     GPIO_PIN_RESET
+#else
+#define APP_STATUS_ON_STATE      GPIO_PIN_RESET
+#define APP_STATUS_OFF_STATE     GPIO_PIN_SET
+#endif
 
 /* PA8 start gate and PA9 finish handling: when 1 the bot stays planted until the
  * start signal (PA8) goes high, then runs the strategy, and halts when the finish
@@ -272,8 +284,8 @@ int main(void)
   }
 #endif
 
-  /* Module is now active and about to run the strategy: raise the status pin. */
-  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_SET);
+  /* Module is now active and about to run the strategy: drive the status pin. */
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
 
   /* USER CODE END 2 */
 
@@ -290,7 +302,7 @@ int main(void)
      * halt - no further sensing or movement. */
     if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
     {
-      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
       Move_Stop(&move);
       Magnet_Off(&g_magnet);
       break;
@@ -588,7 +600,7 @@ static void App_InitParityGpio(void)
   gpio.Pull = GPIO_NOPULL;
   gpio.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &gpio);
-  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
 }
 
 /*
