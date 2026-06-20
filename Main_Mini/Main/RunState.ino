@@ -8,12 +8,19 @@ namespace RunState
 {
   static volatile bool running = false;
 
-  static void onStart() { running = true; }
+  static void onStart()
+  {
+    running = true;
+    digitalWrite(INDICATOR, HIGH);
+  }
 
   void Init()
   {
     pinMode(START_PIN, INPUT);
     pinMode(STOP_PIN,  INPUT);
+
+    pinMode(INDICATOR, OUTPUT);
+    digitalWrite(INDICATOR, LOW);
 
     attachInterrupt(digitalPinToInterrupt(START_PIN), onStart, RISING);
 
@@ -37,6 +44,7 @@ ISR(PCINT2_vect)
   if (digitalRead(STOP_PIN) == HIGH)
   {
     RunState::running = false;
+    digitalWrite(INDICATOR, LOW);
     Move::Walk(FORWARD, 0);
   }
 }

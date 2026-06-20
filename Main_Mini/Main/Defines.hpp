@@ -62,6 +62,9 @@
 #define START_PIN     2     // D2 - INT0
 #define STOP_PIN      1     // D1 - PCINT17
 
+// Active indicator: HIGH while running, LOW while stopped.
+#define INDICATOR     0     // TODO: set to an available digital output pin
+
 #define RESET         13
 
 #define SW_ON         1
