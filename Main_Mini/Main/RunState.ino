@@ -7,6 +7,7 @@
 namespace RunState
 {
   static volatile bool running = false;
+  static volatile bool stopped = false;   // latched once stop is pressed
 
   // Previous pin levels, so we react to a rising edge instead of a level.
   static volatile uint8_t prevStart = LOW;
@@ -28,15 +29,18 @@ namespace RunState
     uint8_t s = digitalRead(START_PIN);
     uint8_t e = digitalRead(STOP_PIN);
 
-    if (s == HIGH && prevStart == LOW)
+    // Start only works once, and never after a stop.
+    if (s == HIGH && prevStart == LOW && !stopped)
     {
       running = true;
       digitalWrite(INDICATOR, HIGH);
     }
 
+    // Stop latches: once pressed, start can no longer re-enable.
     if (e == HIGH && prevStop == LOW)
     {
       running = false;
+      stopped = true;
       digitalWrite(INDICATOR, LOW);
       Move::Walk(FORWARD, 0);
     }

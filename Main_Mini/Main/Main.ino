@@ -28,23 +28,10 @@ void setup()
 
 void loop()
 {
-    static bool didStartAction = false;
-
-    if(!RunState::IsRunning())
-    {
-        Move::Walk(FORWARD, 0);
-        didStartAction = false;     // re-arm for the next start
-        return;
-    }
-
-    // On start: drive forward for 1s at speed 200, once.
-    if(!didStartAction)
-    {
+    if(RunState::IsRunning())
         Move::Walk(FORWARD, 200);
-        delay(1000);
+    else
         Move::Walk(FORWARD, 0);
-        didStartAction = true;
-    }
 
     // --- normal behavior disabled for start test ---
     /*
