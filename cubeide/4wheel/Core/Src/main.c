@@ -116,7 +116,7 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  *   0 -> PA11 low  when active  (LED to VCC:  3V3 -> LED -> R -> PA11) */
 #define APP_STATUS_PORT          GPIOA
 #define APP_STATUS_PIN           GPIO_PIN_11
-#define APP_STATUS_ACTIVE_HIGH   1
+#define APP_STATUS_ACTIVE_HIGH   0
 
 #if APP_STATUS_ACTIVE_HIGH
 #define APP_STATUS_ON_STATE      GPIO_PIN_SET
@@ -131,10 +131,9 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * signal (PA9) goes high. Set to 0 to run immediately and never auto-halt. */
 #define APP_USE_START_FINISH_SIGNALS 1
 
-/* Temporary bench behaviour: ignore the strategies and just drive straight
- * forward with the electromagnet held at 100. Set to 0 to restore the normal
- * strategy dispatch. */
-#define APP_FORWARD_MAGNET_TEST 0
+/* Start/stop bring-up: when running, just drive straight forward (magnet held)
+ * instead of the seek strategy. Set to 0 to restore the normal strategy dispatch. */
+#define APP_FORWARD_MAGNET_TEST 1
 #define APP_FORWARD_TEST_SPEED  255
 
 /* Edge reflex. The two wired light sensors watch the arena boundary: on the
@@ -160,13 +159,12 @@ typedef enum
 
 static volatile AppStrategy g_strategy = APP_STRATEGY_0;
 
-/* Latched run state for the start/stop logic: start once, stop once, no restart. */
-typedef enum
-{
-    RUN_IDLE = 0,     /* waiting for the start signal (PA8) */
-    RUN_ACTIVE = 1,   /* started: running the strategy */
-    RUN_STOPPED = 2   /* stopped (PA9) for good - a later start is ignored */
-} RunState;
+#if APP_USE_START_FINISH_SIGNALS
+/* Interrupt-driven start/stop flags, set in HAL_GPIO_EXTI_Callback. Stop latches:
+ * once g_stopped is true, a later start can no longer set g_running. */
+static volatile bool g_running = false;
+static volatile bool g_stopped = false;
+#endif
 
 static Light *g_lights[4] =
 {
@@ -280,11 +278,7 @@ int main(void)
     }
   }
 
-#if APP_USE_START_FINISH_SIGNALS
-  /* Latched start/stop: begin IDLE (PA11 already low from App_InitParityGpio).
-   * The loop raises PA11 and runs once PA8 is pressed, and latches off on PA9. */
-  RunState run_state = RUN_IDLE;
-#else
+#if !APP_USE_START_FINISH_SIGNALS
   /* No start/stop gating: the module is active immediately. */
   HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
 #endif
@@ -300,30 +294,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 #if APP_USE_START_FINISH_SIGNALS
-    /* Latched start/stop. PA8 starts the run once; PA9 stops it for good. While
-     * IDLE we only watch for start; while ACTIVE we only watch for stop; once
-     * STOPPED nothing restarts it. So a second start press has no effect, and a
-     * start press after a stop is ignored. */
-    if (run_state == RUN_IDLE)
+    /* Interrupt-driven start/stop: HAL_GPIO_EXTI_Callback sets g_running on the
+     * start signal and clears it (latched) on stop. While not running, hold still
+     * and skip the movement below. */
+    if (!g_running)
     {
-      if (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_SET)
-      {
-        run_state = RUN_ACTIVE;
-        HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
-      }
-    }
-    else if (run_state == RUN_ACTIVE)
-    {
-      if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
-      {
-        run_state = RUN_STOPPED;
-        HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
-      }
-    }
-
-    if (run_state != RUN_ACTIVE)
-    {
-      /* Idle (pre-start) or stopped (terminal): hold still and skip the strategy. */
       Move_Stop(&move);
       Magnet_Off(&g_magnet);
       HAL_Delay(5);
@@ -614,6 +589,31 @@ static void App_InitParityGpio(void)
   gpio.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &gpio);
   HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+}
+
+/*
+ * Interrupt-driven start/stop. PA8/PA9 are EXTI rising inputs (start = PA9,
+ * stop = PA8); this fires on a rising edge of either. Stop wins and latches -
+ * once stopped, start can no longer re-enable. Mirrors the mini bot's RunState
+ * pin-change ISR. The status LED (PA11) is driven here too.
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+#if APP_USE_START_FINISH_SIGNALS
+  if (GPIO_Pin == APP_FINISH_PIN)            /* stop */
+  {
+    g_running = false;
+    g_stopped = true;
+    HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+  }
+  else if ((GPIO_Pin == APP_START_PIN) && !g_stopped)   /* start */
+  {
+    g_running = true;
+    HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+  }
+#else
+  (void)GPIO_Pin;
+#endif
 }
 
 /*
