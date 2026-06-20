@@ -261,6 +261,20 @@ int main(void)
     }
   }
 
+#if APP_USE_START_FINISH_SIGNALS
+  /* Start gate: stay planted (motors stopped, magnet engaged) until the start
+   * signal goes high on PA8, so the bot never moves before the match begins. */
+  Move_Stop(&move);
+  Magnet_Default(&g_magnet);
+  while (HAL_GPIO_ReadPin(APP_START_PORT, APP_START_PIN) == GPIO_PIN_RESET)
+  {
+    /* wait for start */
+  }
+#endif
+
+  /* Module is now active and about to run the strategy: raise the status pin. */
+  HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -271,12 +285,56 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    /* Just drive straight forward, nothing else. */
+#if APP_USE_START_FINISH_SIGNALS
+    /* Finish: PA9 high ends the match. Stop driving, release the magnets, and
+     * halt - no further sensing or movement. */
+    if (HAL_GPIO_ReadPin(APP_FINISH_PORT, APP_FINISH_PIN) == GPIO_PIN_SET)
+    {
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, GPIO_PIN_RESET);
+      Move_Stop(&move);
+      Magnet_Off(&g_magnet);
+      break;
+    }
+#endif
+
+    /* Edge reflex runs above the strategy: a line under either light sensor
+     * means we are at the arena boundary, so back off and turn away from the
+     * side that hit it before any normal driving this tick. */
+    bool line_rotate_dir;
+    if (App_SeesLine(&line_rotate_dir))
+    {
+      App_LineAvoidManeuver(line_rotate_dir);
+    }
+    else
+    {
+#if APP_FORWARD_MAGNET_TEST
+    /* Straight-forward bench test: magnet at max, drive forward at max. */
+    Magnet_SetStrength(&g_magnet, MAGNET_PWM_PERIOD);
     Move_Walk(&move, MOVE_FORWARD, APP_FORWARD_TEST_SPEED);
     Move_Update(&move);
+#else
+    if (g_strategy == APP_STRATEGY_1)
+    {
+      App_Strategy1_Tick();
+    }
+    else
+    {
+      App_Strategy0_Tick();
+    }
+#endif
+    }
 
     HAL_Delay(5);
   }
+
+#if APP_USE_START_FINISH_SIGNALS
+  /* Match finished (PA9): remain stopped and de-energized for good. */
+  Move_Stop(&move);
+  Magnet_Off(&g_magnet);
+  while (1)
+  {
+  }
+#endif
   /* USER CODE END 3 */
 }
 
