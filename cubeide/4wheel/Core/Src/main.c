@@ -98,16 +98,20 @@ static Light g_bl;
 static const SeekTuning g_seek_tuning = SEEK_TUNING_DEFAULT_INITIALIZER;
 static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 
-/* Match control signals (all active-high level inputs, stable from power-up):
+/* Match control signals:
  *   PB5 - strategy select, latched once at boot (0 -> strategy 0, 1 -> strategy 1)
- *   PA9 - start: the match begins when this reads 1
- *   PA8 - finish: the match ends (stop + magnets off) when this reads 1 */
-#define APP_STRATEGY_PORT   GPIOB
-#define APP_STRATEGY_PIN    GPIO_PIN_5
-#define APP_START_PORT      GPIOA
-#define APP_START_PIN       GPIO_PIN_9
-#define APP_FINISH_PORT     GPIOA
-#define APP_FINISH_PIN      GPIO_PIN_8
+ *   PA8 - single start/stop line from the start module: HIGH = run, LOW = stop.
+ *         Polled as a level in the main loop (see App_UpdateRunState). The stop
+ *         latches: once the match has run and the line drops LOW, a later HIGH
+ *         can no longer restart it (needs a power-cycle/reset). */
+#define APP_STRATEGY_PORT     GPIOB
+#define APP_STRATEGY_PIN      GPIO_PIN_5
+#define APP_RUN_SIGNAL_PORT   GPIOA
+#define APP_RUN_SIGNAL_PIN    GPIO_PIN_8
+
+/* Number of consecutive LOW polls required to register a stop, so a single
+ * glitch on the line can't latch the match off mid-run. ~5 ms per loop tick. */
+#define APP_STOP_DEBOUNCE_COUNT  3U
 
 /* PA11 - "module active" status output: driven to the ACTIVE level while the
  * strategy runs, and to the INACTIVE level before start and after a stop/finish.
@@ -126,9 +130,9 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
 #define APP_STATUS_OFF_STATE     GPIO_PIN_SET
 #endif
 
-/* PA8 start gate and PA9 finish handling: when 1 the bot stays planted until the
- * start signal (PA8) goes high, then runs the strategy, and halts when the finish
- * signal (PA9) goes high. Set to 0 to run immediately and never auto-halt. */
+/* Start/stop gating: when 1 the bot stays planted until the PA8 line goes high,
+ * then runs, and halts (latched) when the line drops low. Set to 0 to run
+ * immediately and never auto-halt. */
 #define APP_USE_START_FINISH_SIGNALS 1
 
 /* Start/stop bring-up: when running, just drive straight forward (magnet held)
@@ -141,7 +145,7 @@ static volatile SeekMode g_seek_mode = SEEK_MODE_LOOK;
  * whichever side hit it (left sensor -> rotate right, right sensor -> rotate
  * left), then resumes. Sensor->side mapping is set in App_SeesLine(); swap it
  * there if the bot turns the wrong way. Tune the durations/speeds here. */
-#define APP_LINE_TRIGGER_COLOR  BBB_BLACK   /* color that counts as "the line"; flip to BBB_WHITE */
+#define APP_LINE_TRIGGER_COLOR  BBB_WHITE   /* color that counts as "the line"; flip to BBB_BLACK */
 #define APP_LINE_BACKUP_MS      500U
 #define APP_LINE_BACKUP_SPEED   255
 #define APP_LINE_ROTATE_MS      500U
@@ -160,10 +164,10 @@ typedef enum
 static volatile AppStrategy g_strategy = APP_STRATEGY_0;
 
 #if APP_USE_START_FINISH_SIGNALS
-/* Interrupt-driven start/stop flags, set in HAL_GPIO_EXTI_Callback. Stop latches:
- * once g_stopped is true, a later start can no longer set g_running. */
-static volatile bool g_running = false;
-static volatile bool g_stopped = false;
+/* Polled start/stop state, updated by App_UpdateRunState() from the PA8 level.
+ * Stop latches: once g_stopped is true, a later HIGH can no longer set g_running. */
+static bool g_running = false;
+static bool g_stopped = false;
 #endif
 
 static Light *g_lights[4] =
@@ -189,6 +193,9 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static void MX_USART1_UART_Init(void);
 static void App_InitParityGpio(void);
+#if APP_USE_START_FINISH_SIGNALS
+static void App_UpdateRunState(void);   /* poll PA8 level, latch start/stop */
+#endif
 static void App_Strategy0_Tick(void);   /* seek / chase / catch */
 static void App_Strategy1_Tick(void);   /* alternate strategy (stub) */
 static bool App_SeesLine(bool *rotate_dir);     /* PB3/PB4 on the line; sets turn-away dir */
@@ -294,9 +301,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 #if APP_USE_START_FINISH_SIGNALS
-    /* Interrupt-driven start/stop: HAL_GPIO_EXTI_Callback sets g_running on the
-     * start signal and clears it (latched) on stop. While not running, hold still
-     * and skip the movement below. */
+    /* Polled start/stop: App_UpdateRunState reads the PA8 level and latches the
+     * run state (HIGH -> run, LOW after running -> stop, no restart). While not
+     * running, hold still and skip the movement below. */
+    App_UpdateRunState();
+
     if (!g_running)
     {
       Move_Stop(&move);
@@ -591,30 +600,50 @@ static void App_InitParityGpio(void)
   HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
 }
 
-/*
- * Interrupt-driven start/stop. PA8/PA9 are EXTI rising inputs (start = PA9,
- * stop = PA8); this fires on a rising edge of either. Stop wins and latches -
- * once stopped, start can no longer re-enable. Mirrors the mini bot's RunState
- * pin-change ISR. The status LED (PA11) is driven here too.
- */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
 #if APP_USE_START_FINISH_SIGNALS
-  if (GPIO_Pin == APP_FINISH_PIN)            /* stop */
+/*
+ * Polled start/stop on the single PA8 level line (HIGH = run, LOW = stop),
+ * called once per main-loop tick. Behaviour:
+ *   - line HIGH  -> start running (only the first time; pressing start again
+ *                   while already running does nothing).
+ *   - line LOW after it has been running -> stop and LATCH: g_stopped sticks,
+ *                   so a later HIGH can no longer restart it (until reset).
+ * A short LOW glitch is ignored via APP_STOP_DEBOUNCE_COUNT consecutive reads,
+ * so noise can't kill the match mid-run. The status LED (PA11) tracks the state.
+ */
+static void App_UpdateRunState(void)
+{
+  static uint8_t low_count = 0U;
+  bool sig_high;
+
+  if (g_stopped)
   {
-    g_running = false;
-    g_stopped = true;
-    HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+    return;   /* latched off until power-cycle/reset */
   }
-  else if ((GPIO_Pin == APP_START_PIN) && !g_stopped)   /* start */
+
+  sig_high = (HAL_GPIO_ReadPin(APP_RUN_SIGNAL_PORT, APP_RUN_SIGNAL_PIN) == GPIO_PIN_SET);
+
+  if (sig_high)
   {
-    g_running = true;
-    HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+    low_count = 0U;
+    if (!g_running)
+    {
+      g_running = true;
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_ON_STATE);
+    }
   }
-#else
-  (void)GPIO_Pin;
-#endif
+  else if (g_running)
+  {
+    /* Was running and the line went low: debounce, then stop and latch. */
+    if (++low_count >= APP_STOP_DEBOUNCE_COUNT)
+    {
+      g_running = false;
+      g_stopped = true;
+      HAL_GPIO_WritePin(APP_STATUS_PORT, APP_STATUS_PIN, APP_STATUS_OFF_STATE);
+    }
+  }
 }
+#endif
 
 /*
  * Returns true when either edge light sensor reports the line color, and sets

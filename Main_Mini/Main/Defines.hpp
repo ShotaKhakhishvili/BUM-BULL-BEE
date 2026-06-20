@@ -23,9 +23,10 @@
 #define IR1_ANALOG      A0      // analog IR sensor
 #define IR2_ANALOG      A1      // analog IR sensor
 
-// Logic level a digital IR module outputs when it sees a target.
-// Flip to HIGH if your modules are active-high.
-#define IR_DETECTED     LOW
+// Logic level a digital IR module outputs when it sees the line.
+// White line: modules read HIGH over the (reflective) line.
+// Flip back to LOW to follow a black line instead.
+#define IR_DETECTED     HIGH
 
 // Analog mode: detected when the reading is at/above this (flip >= in
 // Infrared::Detected if your sensor reads the other way).
