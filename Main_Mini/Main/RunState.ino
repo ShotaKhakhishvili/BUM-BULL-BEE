@@ -8,10 +8,41 @@ namespace RunState
 {
   static volatile bool running = false;
 
-  static void onStart()
+  // Previous pin levels, so we react to a rising edge instead of a level.
+  static volatile uint8_t prevStart = LOW;
+  static volatile uint8_t prevStop  = LOW;
+
+  // Enable a pin-change interrupt on any pin, on any port (PCINT group is
+  // derived from the pin, so this works wherever START/STOP are defined).
+  static void enablePinChange(uint8_t pin)
   {
-    running = true;
-    digitalWrite(INDICATOR, HIGH);
+    *digitalPinToPCMSK(pin) |= bit(digitalPinToPCMSKbit(pin));
+    PCIFR |= bit(digitalPinToPCICRbit(pin));   // clear any stale flag
+    PCICR |= bit(digitalPinToPCICRbit(pin));   // enable that group
+  }
+
+  // Shared handler: a pin-change ISR fires on either edge of any masked pin,
+  // so read the levels and act only on a LOW->HIGH transition.
+  static void handleChange()
+  {
+    uint8_t s = digitalRead(START_PIN);
+    uint8_t e = digitalRead(STOP_PIN);
+
+    if (s == HIGH && prevStart == LOW)
+    {
+      running = true;
+      digitalWrite(INDICATOR, HIGH);
+    }
+
+    if (e == HIGH && prevStop == LOW)
+    {
+      running = false;
+      digitalWrite(INDICATOR, LOW);
+      Move::Walk(FORWARD, 0);
+    }
+
+    prevStart = s;
+    prevStop  = e;
   }
 
   void Init()
@@ -22,11 +53,8 @@ namespace RunState
     pinMode(INDICATOR, OUTPUT);
     digitalWrite(INDICATOR, LOW);
 
-    attachInterrupt(digitalPinToInterrupt(START_PIN), onStart, RISING);
-
-    // D1 has no external interrupt, so use a pin-change interrupt (PCINT17).
-    PCICR  |= (1 << PCIE2);
-    PCMSK2 |= (1 << PCINT17);
+    enablePinChange(START_PIN);
+    enablePinChange(STOP_PIN);
   }
 
   bool IsRunning() { return running; }
@@ -38,13 +66,7 @@ namespace RunState
   }
 }
 
-// PCINT fires on any edge of the masked pin, so check the level.
-ISR(PCINT2_vect)
-{
-  if (digitalRead(STOP_PIN) == HIGH)
-  {
-    RunState::running = false;
-    digitalWrite(INDICATOR, LOW);
-    Move::Walk(FORWARD, 0);
-  }
-}
+// One vector per pin-change group; whichever pins are used route here.
+ISR(PCINT0_vect) { RunState::handleChange(); }   // PORTB  (D8-D13)
+ISR(PCINT1_vect) { RunState::handleChange(); }   // PORTC  (A0-A5)
+ISR(PCINT2_vect) { RunState::handleChange(); }   // PORTD  (D0-D7)
